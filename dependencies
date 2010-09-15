@@ -1,0 +1,53 @@
+##########################################
+# Subversion information
+# $Id: dependencies 22 2009-09-25 07:01:24Z nelsonab $
+# $Revision: 22 $
+##########################################
+
+
+This is a general annotation file to track the various dependencies of the
+Zabcon.
+
+1. Zabbix > 1.8.1
+  --  http://www.zabbix.com
+    Zabbix 1.7 introduced the API which Zabcon uses.
+    In 1.8.1 the API version changed to 1.1 which is now a minimum requirement
+
+2. Ruby
+  --  http://www.ruby-lang.org
+  Quite obviously, Ruby is needed for Zabcon.
+  Ruby package is available in most distributions.
+
+3. Ruby gem
+  --  http://rubygems.org/
+  Must be installed from source on CentOS 5.3
+
+  Download, unpack, run:
+  # ruby setup.rb
+
+4. Ruby gems
+  Ruby gems are ruby packages. Installing all of these is possible with two methods:
+    a) You can let 'gem' download and install them automatically:
+       # gem install <gem_name>
+    b) You can download .gem file and install from the local file:
+       # gem install -l <filename.gem>
+
+  To install all required packages automatically:
+  # gem install json parseconfig highline
+
+  You can upgrade all RubyGems using 'gem install rubygems-update'
+
+  The following Ruby gems are required, with exact package name specified in square brackets:
+
+  2.1 Ruby JSON objects [json]
+    --  http://flori.github.com/json/
+
+  2.2 ParseConfig [parseconfig]
+    --  http://rubyforge.org/projects/parseconfig/
+
+  2.3 Highline [highline]
+    -- http://highline.rubyforge.org/doc/
+
+Gem history:
+r142 removed requirement for Polyglot and Treetop
+r156 removed rawline requirement
