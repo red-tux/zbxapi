@@ -53,6 +53,7 @@ class ZbxAPI
 
   # subordinate classes
   attr_accessor :user, :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap
+  attr_accessor :history
 
   @id=0
   @auth=''
@@ -61,6 +62,9 @@ class ZbxAPI
   private
     @user_name=''
     @password=''
+
+    class Redirect < Exception
+    end
 
   public
 
@@ -76,6 +80,7 @@ class ZbxAPI
     @application = ZbxAPI_Application.new(self)
     @trigger = ZbxAPI_Trigger.new(self)
     @sysmap = ZbxAPI_Sysmap.new(self)
+    @history = ZbxAPI_History.new(self)
     @id=0
 
     debug(6,"protocol: #{@url.scheme}, host: #{@url.host}")
@@ -222,8 +227,6 @@ class ZbxAPI
     return obj['result']
   end
   
-  protected
-
   # Function to test weather or not a function will work with the current API version of the server
   # If no options are presented the major and minor are assumed to be the minimum version
   # number suitable to run the function
@@ -326,9 +329,9 @@ class ZbxAPI_User < ZbxAPI_Sub
 
     #Check input parameters
 
-    raise ZbxAPI_ParameterError, "Missing name argument", "User.create" if options["name"].nil?
-    raise ZbxAPI_ParameterError, "Missing alias argument", "User.create" if options["alias"].nil?
-    raise ZbxAPI_ParameterError, "Missing passwd argument", "User.create" if options["passwd"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'name' argument", "User.create" if options["name"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'alias' argument", "User.create" if options["alias"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'passwd' argument", "User.create" if options["passwd"].nil?
 
     obj=do_request(json_obj('user.create',options))
     return obj['result']
@@ -365,11 +368,11 @@ class ZbxAPI_User < ZbxAPI_Sub
 
 #    p options
 
-    raise ZbxAPI_ParameterError, "Missing userid argument", "User.addmedia" if options["userid"].nil?
-    raise ZbxAPI_ParameterError, "Missing mediatypeid argument", "User.addmedia" if options["mediatypeid"].nil?
-    raise ZbxAPI_ParameterError, "Missing severity argument", "User.addmedia" if options["severity"].nil?
-    raise ZbxAPI_ParameterError, "Missing active argument", "User.addmedia" if options["active"].nil?
-    raise ZbxAPI_ParameterError, "Missing period argument", "User.addmedia" if options["period"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'userid' argument", "User.addmedia" if options["userid"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'mediatypeid' argument", "User.addmedia" if options["mediatypeid"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'severity' argument", "User.addmedia" if options["severity"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'active' argument", "User.addmedia" if options["active"].nil?
+    raise ZbxAPI_ParameterError, "Missing 'period' argument", "User.addmedia" if options["period"].nil?
 
     args = {}
     args["userid"]=options["userid"]
@@ -782,6 +785,39 @@ class ZbxAPI_Sysmap < ZbxAPI_Sub
 end
 
 #------------------------------------------------------------------------------
+#
+# Class ZbxAPI_History
+#
+# Class encapsulating history functions
+#
+# get
+#
+#------------------------------------------------------------------------------
+
+class ZbxAPI_History
+
+  def initialize(server)
+    @server=server
+  end
+
+  #Get the history for an item.
+  # itemids is a required option
+  # example: get({"itemids"=>12345})
+  def get(options)
+    @server.checkauth
+    @server.checkversion(1,3)
+
+    raise ZbxAPI_ParameterError, "Missing 'itemid'", "History.get" if options["itemids"].nil?
+
+    p obj=@server.raw_api("history.get",options)
+    return obj['result']
+  end
+
+end
+
+
+#------------------------------------------------------------------------------
+
 
 if __FILE__ == $0
 
