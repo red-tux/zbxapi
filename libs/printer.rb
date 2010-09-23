@@ -154,7 +154,7 @@ class OutputPrinter
   end
 
   def format_for_print(item)
-    if item.nil?
+    if item.nil? || item==[]
       return NILCHAR
     else
       case item.class.to_s
