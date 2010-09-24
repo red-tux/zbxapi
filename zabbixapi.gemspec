@@ -24,15 +24,16 @@
 
 #Zabbix API Ruby Interface GemSpec file
 
-Gem::Specification.new do |s|
+spec = Gem::Specification.new do |s|
   s.name = %q{zabbixapi}
   s.rubyforge_project = "zabbixapi"
-  s.version = "0.1.0"
+  s.version = "0.1.1"
   s.authors = ["A. Nelson"]
   s.email = %q{nelsonab@red-tux.net}
   s.summary = %q{Ruby wrapper to the Zabbix API}
   s.homepage = %q{http://trac.red-tux.net/}
   s.description = %q{Provides a straight forward interface to manipulate Zabbix servers using the Zabbix API.}
+  s.licenses = "LGPL 2.1"
   s.requirements = "Requires json"
   s.add_dependency('json')
   s.require_paths =["."]

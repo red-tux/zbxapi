@@ -1,27 +1,28 @@
-#LGPL 2.1   http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
-#Zabbix API Ruby Library.
-#Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
+# Title:: Zabbix API Ruby Library
+# License:: LGPL 2.1   http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+# Copyright:: Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
 #
-#This library is free software; you can redistribute it and/or
-#modify it under the terms of the GNU Lesser General Public
-#License as published by the Free Software Foundation; either
-#version 2.1 of the License, or (at your option) any later version.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
 #
-#This library is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#You should have received a copy of the GNU Lesser General Public
-#License along with this library; if not, write to the Free Software
-#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+#--
 ##########################################
 # Subversion information
 # $Id$
 # $Revision$
 ##########################################
-
+#++
 
 #setup our search path or libraries
 path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"
@@ -39,21 +40,22 @@ require 'json'
 
 #------------------------------------------------------------------------------
 #
-# Class ZbxAPI
-#
+# Class ZabbixAPI
+#++
 # Main Zabbix API class.
 #
 #------------------------------------------------------------------------------
 
-class ZbxAPI
+class ZabbixAPI
 
   include ZDebug
 
   attr_accessor :method, :params, :debug_level, :auth
 
-  # subordinate classes
-  attr_accessor :user, :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap
-  attr_accessor :history
+  #subordinate class
+  attr_accessor :user # [User#new]
+  #subordinate class
+  attr_accessor :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap, :history
 
   @id=0
   @auth=''
@@ -63,11 +65,17 @@ class ZbxAPI
     @user_name=''
     @password=''
 
-    class Redirect < Exception
+
+    class Redirect < Exception #:nodoc: all
     end
 
   public
 
+  # The initialization routine for the Zabbix API class
+  # * url is a string defining the url to connect to, it should only point to the base url for Zabbix, not the api directory
+  # * debug_level is the default level to be used for debug messages
+  # Upon successful initialization the class will be set up to allow a connection to the Zabbix server
+  # A connection however will not have been made, to actually connect to the Zabbix server use the login method
   def initialize(url,debug_level=0)
     set_debug_level(debug_level)
     @orig_url=url  #save the origional url
@@ -88,6 +96,10 @@ class ZbxAPI
     debug(6,"query: #{@url.query}, fragment: #{@url.fragment}")
   end
 
+  #wraps the givn information into the appropriate JSON object
+  #* method is a string
+  #* params is a hash of the parameters for the method to be called
+  #Returns a hash representing a Zabbix API JSON call
   def json_obj(method,params={})
     obj =
       {
@@ -101,7 +113,28 @@ class ZbxAPI
     return obj.to_json
   end
 
+
+  #Performs a log in to the Zabbix server
+  #* _user_ is a string with the username
+  #* _password_ is a string with the user''s password
+  #* _save_ tells the method to save the login details in internal class variables or not
+  #
+  #Raises:
+  #
+  #* Zbx_API_ExeeptionBadAuth is raised when one of the following conditions is met
+  #  1. no-string variables were passed in
+  #  1. no username or password was passed in or saved from a previous login
+  #  1. login details were rejected by the server
+  #* ZbxAPI_ExceptionBadServerUrl
+  #  1. There was a socket error
+  #  1. The url used to create the class was bad
+  #  1. The connection to the server was refused
   def login(user='',password='',save=true)
+    p user.class
+    p password.class
+    if user.class!=String or password.class!=String
+      raise ZbxAPI_ExceptionBadAuth.new,'Login called with non-string values'
+    end
     if (user!='' and password!='') then
       l_user = user
       l_password = password
@@ -113,7 +146,7 @@ class ZbxAPI
       l_user = @user_name
       l_password = @password
     else
-      raise ZbxAPI_ExceptionBadAuth.new,'No Authentication Information Available'
+
     end
 
     begin
@@ -141,6 +174,8 @@ class ZbxAPI
 
   end
 
+  # Tests to determine if the login information is still valid
+  # returns: true if it is valid  or false if it is not.
   def test_login
     if @auth!='' then
       result = do_request(json_obj('user.checkauth',
@@ -155,21 +190,60 @@ class ZbxAPI
     end
   end
 
-  def setup_connection
-    @http=Net::HTTP.new(@url.host, @url.port)
-    http.use_ssl=true if @url.class==URI::HTTPS
+  #Returns true if a login was performed
+  def loggedin?
+    !(@auth=='' or @auth.nil?)
+  end
+
+  #wrapper to loggedin?
+  #returns nothing, raises the exception ZbxAPI_ExceptionBadAuth if loggedin? returns false 
+  def checkauth
+    raise ZbxAPI_ExceptionBadAuth, 'Not logged in' if !loggedin?
+  end
+
+  #returns the version number for the API from the server
+  def API_version(options={})
+    return "#{@major}.#{@minor}"
+  end
+
+  # Provides raw access to the API via a small wrapper.
+  # _method_ is the method to be called
+  # _params_ are the parameters to be passed to the call
+  # returns a hash of the results from the server
+  def raw_api(method,params=nil)
+    debug(6,method,"method")
+    debug(6,params,"Parameters")
+
+    checkauth
+    checkversion(1,1)
+    params={} if params==nil
+
+    obj=do_request(json_obj(method,params))
+    return obj['result']
+  end
+  
+  # Function to test weather or not a function will work with the current API version of the server
+  # If no options are presented the major and minor are assumed to be the minimum version
+  # number suitable to run the function
+  # Does not explicitly return anything, but raises ZbxAPI_ExceptionVersion if there is a problem
+  def checkversion(major,minor,options=nil)
+    caller[0]=~/`(.*?)'/
+    caller_func=$1
+
+    raise ZbxAPI_ExceptionVersion, "#{caller_func} requires API version #{major}.#{minor} or higher" if major>@major
+    raise ZbxAPI_ExceptionVersion, "#{caller_func} requires API version #{major}.#{minor} or higher" if minor>@minor
 
   end
 
+  #Sends JSON encoded string to server
   def do_request(json_obj)
-
     #puts json_obj
-    redirects=0    
+    redirects=0
     begin  # This is here for redirects
       http = Net::HTTP.new(@url.host, @url.port)
       http.use_ssl=true if @url.class==URI::HTTPS
       response = nil
-#    http.set_debug_output($stderr)                                  #Uncomment to see low level HTTP debug 
+#    http.set_debug_output($stderr)                                  #Uncomment to see low level HTTP debug
 #    http.use_ssl = @url.scheme=='https' ? true : false
 #    http.start do |http|
       headers={'Content-Type'=>'application/json-rpc',
@@ -180,7 +254,7 @@ class ZbxAPI
         puts "Redirecting to #{response['location']}"
         @url=URI.parse(response['location'])
 				raise Redirect
-      end     
+      end
       debug(8,"Response Code: #{response.code}")
       debug(8,response.body,"Response Body",5000)
 #    end
@@ -202,58 +276,21 @@ class ZbxAPI
     rescue NoMethodError
       raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host}", :retry=>false)
     end
-
-  end
-  
-
-  def loggedin?
-    !(@auth=='' or @auth.nil?)
   end
 
-  #returns the version number for the API from the server
-  def API_version(options={})
-    return "#{@major}.#{@minor}"
-  end
+  private
 
-  def raw_api(method,params=nil)
-    debug(6,method,"method")
-    debug(6,params,"Parameters")
-
-    checkauth
-    checkversion(1,1)
-    params={} if params==nil
-
-    obj=do_request(json_obj(method,params))
-    return obj['result']
-  end
-  
-  # Function to test weather or not a function will work with the current API version of the server
-  # If no options are presented the major and minor are assumed to be the minimum version
-  # number suitable to run the function
-  def checkversion(major,minor,options=nil)
-    caller[0]=~/`(.*?)'/
-    caller_func=$1
-
-    raise ZbxAPI_ExceptionVersion, "#{caller_func} requires API version #{major}.#{minor} or higher" if major>@major
-    raise ZbxAPI_ExceptionVersion, "#{caller_func} requires API version #{major}.#{minor} or higher" if minor>@minor
-
-  end
-
-  def checkauth
-    raise ZbxAPI_ExceptionBadAuth, 'Not logged in' if @auth=='' or @auth.nil?
+  def setup_connection
+    @http=Net::HTTP.new(@url.host, @url.port)
+    http.use_ssl=true if @url.class==URI::HTTPS
   end
 end
 
-#------------------------------------------------------------------------------
-#
 # Class: Zbx_API_Sub
 # Wrapper class to ensure all class calls goes to the parent object not the
 # currently instantiated object.
 # Also ensures class specific variable sanity for global functions
-#
-#------------------------------------------------------------------------------
-
-class ZbxAPI_Sub < ZbxAPI
+class ZbxAPI_Sub < ZabbixAPI #:nodoc: all
   attr_accessor :parent
 
   def initialize(parent)
@@ -281,28 +318,28 @@ class ZbxAPI_Sub < ZbxAPI
   end
 end
 
-#------------------------------------------------------------------------------
-#
 # Class ZbxAPI_User
 #
 # Class encapsulating User functions
 #
 # API Function          Status
-# get                   Implemented, need error checking
-# authenticate          Will not implement here, belongs in ZbxAPI main class
-# checkauth             Will not implement here, belongs in ZbxAPI main class
-# getid                 Implemented
-# create               Implemented, need to test more to find fewest items
-#                         needed, input value testing needed
-# update
-# addmedia
-# deletemedia
-# updatemedia
-# delete    Implemented, checking of input values needed
+# [get]                   Implemented, need error checking
+# [authenticate]          Will not implement here, belongs in ZabbixAPI main class
+# [checkauth]             Will not implement here, belongs in ZabbixAPI main class
+# [getid]                 Implemented
+# [create]               Implemented, need to test more to find fewest items
+#                        needed, input value testing needed
+# [update]
+#
+# [addmedia]
+#
+# [deletemedia]
+#
+# [updatemedia]
+# [delete]    Implemented, checking of input values needed
 #
 # All functions expect a hash of options to add.
 # If multiple users need to be manipulated it must be broken out into different calls
-#------------------------------------------------------------------------------
 
 class ZbxAPI_User < ZbxAPI_Sub
   def get(options={})
@@ -338,6 +375,8 @@ class ZbxAPI_User < ZbxAPI_Sub
   end
 
   # Alias function name for code written to work against 1.0 API
+  # may be removed in future versions
+  
   def add(options)
     puts "WARNING API Function User.add will is deprecated and will be removed in the future without further warning"
     create(options)
@@ -390,7 +429,7 @@ class ZbxAPI_User < ZbxAPI_Sub
   end
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
 # Class ZbxAPI_Host
 #
@@ -404,7 +443,7 @@ end
 # massupdate
 # delete    Implimented
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 class ZbxAPI_Host < ZbxAPI_Sub
   def get(options={})
@@ -449,7 +488,7 @@ class ZbxAPI_Host < ZbxAPI_Sub
 
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
 # Class ZbxAPI_Item
 #
@@ -462,7 +501,7 @@ end
 # update
 # delete                Function implemented  - need to add type checking to input
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 class ZbxAPI_Item < ZbxAPI_Sub
   def get(options={})
@@ -505,7 +544,7 @@ class ZbxAPI_Item < ZbxAPI_Sub
   end
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
 # Class ZbxAPI_UserGroup
 #
@@ -522,7 +561,7 @@ end
 # removeusers
 # delete
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 class ZbxAPI_UserGroup < ZbxAPI_Sub
   def get(options={})
@@ -534,7 +573,7 @@ class ZbxAPI_UserGroup < ZbxAPI_Sub
   end
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
 # Class ZbxAPI_HostGroup
 #
@@ -551,7 +590,7 @@ end
 # addgroupstohost
 # updategroupstohost
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 class ZbxAPI_HostGroup < ZbxAPI_Sub
   def create(options={})
@@ -615,7 +654,7 @@ class ZbxAPI_HostGroup < ZbxAPI_Sub
   end
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 #
 # Class ZbxAPI_Application
@@ -630,7 +669,7 @@ end
 # update		Not implemented
 # delete		Not implemented
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 
 class ZbxAPI_Application < ZbxAPI_Sub
@@ -676,7 +715,7 @@ class ZbxAPI_Application < ZbxAPI_Sub
   end
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
 # Class ZbxAPI_Trigger
 #
@@ -690,7 +729,7 @@ end
 # delete		Not implemented
 # addDependency		Not implemented
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 
 class ZbxAPI_Trigger < ZbxAPI_Sub
@@ -720,7 +759,7 @@ class ZbxAPI_Trigger < ZbxAPI_Sub
   end
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
 # Class ZbxAPI_Sysmap
 #
@@ -729,7 +768,7 @@ end
 # get			Not implemented
 # cr	eate		Basic implementation
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 class ZbxAPI_Sysmap < ZbxAPI_Sub
   def create(options={})
@@ -784,7 +823,7 @@ class ZbxAPI_Sysmap < ZbxAPI_Sub
   end
 end
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
 # Class ZbxAPI_History
 #
@@ -792,7 +831,7 @@ end
 #
 # get
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 class ZbxAPI_History
 
@@ -816,13 +855,13 @@ class ZbxAPI_History
 end
 
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 
 if __FILE__ == $0
 
 puts "Performing login"
-zbx_api = ZbxAPI.new('http://localhost')
+zbx_api = ZabbixAPI.new('http://localhost')
 zbx_api.login('apitest','test')
 
 puts

@@ -1,6 +1,5 @@
-#LGPL 2.1   http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
-#Zabbix API Ruby Library.
-#Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
+#License:: LGPL 2.1   http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+#Copyright:: Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
 #
 #This library is free software; you can redistribute it and/or
 #modify it under the terms of the GNU Lesser General Public

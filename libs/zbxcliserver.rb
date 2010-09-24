@@ -40,7 +40,7 @@ class ZbxCliServer
     @password=password
     @debuglevel=debuglevel
     # *Note* Do not rescue errors here, rescue in function that calls this block
-    @server=ZbxAPI.new(@server_url,@debuglevel)
+    @server=ZabbixAPI.new(@server_url,@debuglevel)
     @server.login(@user, @password)
     GlobalVars.instance["auth"]=@server.auth
   end

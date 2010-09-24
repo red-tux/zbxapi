@@ -1,6 +1,5 @@
-#GPL 2.0  http://www.gnu.org/licenses/gpl-2.0.html
-#Zabbix CLI Tool and associated files
-#Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
+#License:: GPL 2.0  http://www.gnu.org/licenses/gpl-2.0.html
+#Copyright:: Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
 #
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License
