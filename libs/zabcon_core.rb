@@ -165,8 +165,8 @@ class ZabconCore
       @commands.insert "delete", "host", @server.method(:deletehost), no_args, @cmd_help.method(:delete_host), @arg_processor.method(:delete_host)
       @commands.insert "delete", "item", @server.method(:deleteitem), ['itemid'], @cmd_help.method(:delete_item), @arg_processor.default
 
-      @commands.insert "raw", "api", @server.method(:raw_api), no_args, no_help, @arg_processor.method(:raw_api)
-      @commands.insert "raw", "json", @server.method(:raw_json), no_args, no_help, @arg_processor.method(:raw_processor)     
+      @commands.insert "raw", "api", @server.method(:raw_api), no_args, @cmd_help.method(:raw_api), @arg_processor.method(:raw_api)
+      @commands.insert "raw", "json", @server.method(:raw_json), no_args, @cmd_help.method(:raw_json), @arg_processor.method(:raw_processor)     
 
       @commands.insert "update", "user", @server.method(:updateuser), no_args, no_help, no_verify
     else
