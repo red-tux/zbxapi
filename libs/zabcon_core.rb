@@ -46,15 +46,15 @@ class ZabconCore
   include ZDebug
 
   def initialize(options)
-    # This must be set first or the debug module will throw and error
+    # This must be set first or the debug module will throw an error
     if (options.debug.nil?)
       set_debug_level(0)
     else
       set_debug_level(options.debug)   
     end
 
-    @env = EnvVars.instance  #make it easier to call the global EnvVars singleton
-    
+    @env = EnvVars.instance  # make it easier to call the global EnvVars singleton
+
     @env.register_notifier("debug",self.method(:set_debug_level))
     @env.register_notifier("api_debug",self.method(:set_debug_api_level))
 
@@ -88,7 +88,7 @@ class ZabconCore
     end
   end
 
-  # Argument logged in is used to determine which set of commands to load.  If loggedin is true then commands which
+  # Argument logged in is used to determine which set of commands to load. If loggedin is true then commands which
   # require a valid login are loaded
   def setupcommands(loggedin)
 
@@ -215,7 +215,7 @@ class ZabconCore
       while line=@input.get_line()
         line=@arg_processor.strip_comments(line)  # use the argument processor's comment stripper'
         next if line.nil?
-        next if line.strip.length==0  #don't bother parsing an empty line'
+        next if line.strip.length==0  # don't bother parsing an empty line'
         debug(6, line, "Input from user")
 
         # this statement calls the command tree parser and sets up rhash

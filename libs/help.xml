@@ -254,7 +254,7 @@ The following example will mimic the get user call:
 
 <!-- 80 Col Marker ######################################################## -->
 
-  <item command="raw_api">
+  <item command="raw_json">
 raw json
 syntax: raw json {json call}
 

@@ -292,7 +292,7 @@ class ZbxCliServer
         puts "Error message: #{e.message["message"]}"
         puts "Error data: #{e.message["data"]}"
       end
-      puts "Origional text:"
+      puts "Original text:"
       puts parameters
       puts
       return {:class=>:raw, :result=>nil}
