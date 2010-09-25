@@ -130,8 +130,8 @@ class ZabbixAPI
   #  1. The url used to create the class was bad
   #  1. The connection to the server was refused
   def login(user='',password='',save=true)
-    p user.class
-    p password.class
+#    p user.class
+#    p password.class
     if user.class!=String or password.class!=String
       raise ZbxAPI_ExceptionBadAuth.new,'Login called with non-string values'
     end
