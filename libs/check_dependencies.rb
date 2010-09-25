@@ -35,7 +35,7 @@ def check_dependencies(*dependencies)
   deps = Hash[*dependencies.collect { |v|
     [v,true]
   }.flatten]
-  
+
   deps.each_key {|dep|
     val=Gem.source_index.find_name(dep).map {|x| x.name}==[]
     puts " #{dep} : Not Installed" if val

@@ -38,7 +38,7 @@ module ZDebug
     @@facility_level= {} if !defined?(@@facility_level)
 
     @@facility_level[facility]=level
-    
+
     # Create debug level if it's not already created
     @@debug_level=0 if !defined?(@@debug_level)
   end
@@ -114,7 +114,7 @@ module ZDebug
     if level<=facility_level
       #parse the caller array to determine who called us, what line, and what file
       caller[0]=~/(.*):(\d+):.*`(.*?)'/
-     
+
       file_tmp=$1
       debug_line=$2
       debug_func=$3

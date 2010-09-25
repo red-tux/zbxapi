@@ -315,7 +315,7 @@ class OutputPrinter
       else
         cols_to_show=cols.empty? ? nil : cols[:show]
       end
-    
+
       puts dataset[:message] if dataset[:message]
 
 #    p dataset[:result].class

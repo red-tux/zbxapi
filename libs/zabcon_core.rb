@@ -50,7 +50,7 @@ class ZabconCore
     if (options.debug.nil?)
       set_debug_level(0)
     else
-      set_debug_level(options.debug)   
+      set_debug_level(options.debug)
     end
 
     @env = EnvVars.instance  # make it easier to call the global EnvVars singleton
@@ -166,7 +166,7 @@ class ZabconCore
       @commands.insert "delete", "item", @server.method(:deleteitem), ['itemid'], @cmd_help.method(:delete_item), @arg_processor.default
 
       @commands.insert "raw", "api", @server.method(:raw_api), no_args, @cmd_help.method(:raw_api), @arg_processor.method(:raw_api)
-      @commands.insert "raw", "json", @server.method(:raw_json), no_args, @cmd_help.method(:raw_json), @arg_processor.method(:raw_processor)     
+      @commands.insert "raw", "json", @server.method(:raw_json), no_args, @cmd_help.method(:raw_json), @arg_processor.method(:raw_processor)
 
       @commands.insert "update", "user", @server.method(:updateuser), no_args, no_help, no_verify
     else

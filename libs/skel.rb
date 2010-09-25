@@ -25,7 +25,7 @@
 #Remove this note section when using in a normal file
 #
 # This is a skeleton file, use this file to create any new files.
-# This file has the default GNU header and copyright, SVN tags 
+# This file has the default GNU header and copyright, SVN tags
 # and default lib file path creation helper.
 #
 # To use copy this file to the desired new file name
@@ -34,7 +34,7 @@
 #  svn propset svn:keywords Id <filename>
 #  svn propset svn:keywords Revision <filename>
 #
-#Remove this note section when using in a normal file 
+#Remove this note section when using in a normal file
 #
 
 

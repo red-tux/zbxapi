@@ -87,8 +87,8 @@ class ZError < RuntimeError
       return false
     end
   end
-end                                  
-  
+end
+
 class ParameterError < ZError
   def initialize(message=nil, params=nil)
     super(message, params)

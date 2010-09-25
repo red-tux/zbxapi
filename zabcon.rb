@@ -29,8 +29,8 @@ path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"
 
 begin
   require 'rubygems'
-rescue LoadError 
-  puts 
+rescue LoadError
+  puts
   puts "Ruby Gems failed to load.  Please install Ruby Gems using your systems"
   puts "package management program or downlaod it from http://rubygems.org."
   puts
@@ -89,7 +89,7 @@ class ZabconApp
       end
     end
   end
-  
+
   def setup_globals
     env=EnvVars.instance  # we must instantiate a singleton before using it
     vars=GlobalVars.instance
@@ -113,7 +113,7 @@ class ZabconApp
     puts RUBY_PLATFORM if EnvVars.instance["echo"]
 
     check_dependencies("parseconfig", "json", "highline")
-    
+
 #    p @options
     if @options.help.nil?
       zabcon=ZabconCore.new(@options)

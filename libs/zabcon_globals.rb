@@ -38,8 +38,8 @@ require path+'zdebug'
 require 'singleton'
 
 # This class is for storing global variables.  This is accomplished by inheriting
-# the singleton class.  To use a global variable it must be registered and then 
-# if some part of the program needs to be notified of a change a notifier can 
+# the singleton class.  To use a global variable it must be registered and then
+# if some part of the program needs to be notified of a change a notifier can
 # be registered for that variable.
 class GlobalsBase
   include Singleton
@@ -91,7 +91,7 @@ class GlobalsBase
     else
       @callbacks[key]<<proc
     end
-  end  
+  end
 end
 
 class GlobalVars < GlobalsBase

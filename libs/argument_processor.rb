@@ -182,8 +182,8 @@ class ArgumentProcessor
       escaped=false  # when we set escape to true we use next to skip the rest of the block
     end
     items<<item if item.length>0  # be sure not to forget the last element from the block
-    
-    raise ParseError.new("Closing #{qchar} not found!") if quoted  
+
+    raise ParseError.new("Closing #{qchar} not found!") if quoted
 
     items
   end
@@ -334,7 +334,7 @@ class ArgumentProcessor
       }
     end
     args = valid_user_vars.merge(args)
-    
+
     default_helper(args)
 
   end
@@ -570,7 +570,7 @@ class ArgumentProcessor
 #    p valid_user_vars
 #    parameters = valid_user_vars.merge(parameters)
 #    p parameters
-    
+
     required_parameters=[ 'type' ]
 
     if parameters["type"].nil?
@@ -734,7 +734,7 @@ if __FILE__ == $0
 
   p arg='"this is a quote \" now we close it" closed'
   p arg_processor.params_to_hash(arg)
-  
+
   p arg='item=2 second=item third="this is a short sentence"'
   p arg_processor.params_to_hash(arg)
 

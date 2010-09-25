@@ -43,7 +43,7 @@ class CommandHelp
 
     @doc=REXML::Document.new(@file).elements["//help[@language='#{language}']"]
 #    puts @doc.root.attributes
-   
+
     EnvVars.instance.register_notifier("language",self.method(:language=))
   end
 
