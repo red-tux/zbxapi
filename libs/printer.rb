@@ -72,7 +72,7 @@ class OutputPrinter
     item.each do |value, index|
       w+= value.length + index.length + 6   # 6 is for " => " and ", "
     end
-    w-=2  # subtract out last comm and and space
+    w-=2  # subtract out last comma and space
     return w
   end
 
@@ -81,7 +81,7 @@ class OutputPrinter
     item.each do |value|
       w+=value.length + 2  # 2 is for ", "
     end
-    w-=2  #remove last comma and space
+    w-=2  # remove last comma and space
     return w
   end
 
@@ -115,7 +115,7 @@ class OutputPrinter
     if dataset.class==Array then
       widths=headers.collect {|x| 0}  # setup our resultant array of widths
 
-      # checkthe widths for the headers
+      # check the widths for the headers
       headers.each_with_index { |value, index| widths[index] = value.length }
 
       if (dataset.length>0) and (dataset[0].class!=Hash) then
