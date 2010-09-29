@@ -334,7 +334,7 @@ class ArgumentProcessor
       }
     end
     args = valid_user_vars.merge(args)
-
+    
     default_helper(args)
 
   end
@@ -459,13 +459,15 @@ class ArgumentProcessor
       return nil
     end
 
-    valid_parameters=['host', 'groups', 'port', 'status', 'useip', 'dns', 'ip',
+    #TODO, add the ability for both groups and groupids
+
+    valid_parameters=['host', 'groupids', 'port', 'status', 'useip', 'dns', 'ip',
                        'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
                        'ipmi_privilege', 'ipmi_username', 'ipmi_password']
 
     parameters=default_processor(help_func,valid_parameters,args,user_vars,options)[:api_params]
 
-    required_parameters=[ 'host', 'groups' ]
+    required_parameters=[ 'host', 'groupids' ]
 
 #    p required_parameters
 #    p parameters
@@ -488,7 +490,7 @@ class ArgumentProcessor
       raise ParameterError_Missing.new(msg,:retry=>true, :help_func=>help_func)
     end
 
-    groups=convert_or_parse(parameters['groups'])
+    groups=convert_or_parse(parameters['groupids'])
     if groups.class==Fixnum
       parameters['groups']=[{"groupid"=>groups}]
     end
@@ -570,7 +572,7 @@ class ArgumentProcessor
 #    p valid_user_vars
 #    parameters = valid_user_vars.merge(parameters)
 #    p parameters
-
+    
     required_parameters=[ 'type' ]
 
     if parameters["type"].nil?
@@ -734,7 +736,7 @@ if __FILE__ == $0
 
   p arg='"this is a quote \" now we close it" closed'
   p arg_processor.params_to_hash(arg)
-
+  
   p arg='item=2 second=item third="this is a short sentence"'
   p arg_processor.params_to_hash(arg)
 

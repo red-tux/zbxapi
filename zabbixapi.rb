@@ -221,7 +221,7 @@ class ZabbixAPI
     obj=do_request(json_obj(method,params))
     return obj['result']
   end
-
+  
   # Function to test weather or not a function will work with the current API version of the server
   # If no options are presented the major and minor are assumed to be the minimum version
   # number suitable to run the function
@@ -376,7 +376,7 @@ class ZbxAPI_User < ZbxAPI_Sub
 
   # Alias function name for code written to work against 1.0 API
   # may be removed in future versions
-
+  
   def add(options)
     puts "WARNING API Function User.add will is deprecated and will be removed in the future without further warning"
     create(options)

@@ -162,7 +162,7 @@ Add Item
 syntax: add item type=active hostid=num description="some text" key="item.key"
 
 valid parameters:
-  hostid, snmpv3_securitylevel, snmp_community, publickey, delta, history,
+  hostid, snmpv3_securitylevel, snmp_community, publickey, delta, history, 
   key, snmp_oid, delay_flex, multiplier, delay, mtime, username, authtype,
   data_type, ipmi_sensor,snmpv3_authpassphrase, prevorgvalue, units, trends,
   snmp_port, formula, type, params, logtimefmt, snmpv3_securityname,
@@ -238,7 +238,7 @@ syntax: delete user id=num
 
   <item command="delete_item">
 Delete Item
-syntax: delete item itemid=num
+syntax: delete item itemid=num 
  itemid must be a number
  </item>
 
@@ -254,7 +254,7 @@ The following example will mimic the get user call:
 
 <!-- 80 Col Marker ######################################################## -->
 
-  <item command="raw_json">
+  <item command="raw_api">
 raw json
 syntax: raw json {json call}
 

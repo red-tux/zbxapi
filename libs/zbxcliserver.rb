@@ -158,7 +158,7 @@ class ZbxCliServer
       elsif parameters["userid"].nil?
         puts "Missing required userid statement."
       end
-      p @server.user.update([parameters])
+      p @server.user.update([parameters])  #TODO: remove print statement or comment if needed
     end
   end
 
@@ -292,7 +292,7 @@ class ZbxCliServer
         puts "Error message: #{e.message["message"]}"
         puts "Error data: #{e.message["data"]}"
       end
-      puts "Original text:"
+      puts "Origional text:"
       puts parameters
       puts
       return {:class=>:raw, :result=>nil}
