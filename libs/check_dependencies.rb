@@ -27,9 +27,27 @@ path=File.expand_path(File.dirname(__FILE__) + "/../libs")+"/"
 
 require "rubygems"
 
-def check_dependencies(*dependencies)
+#checks to ensure all dependencies are available, forcefully exits with an
+# exit code of 1 if the dependency check fails
+# * ruby_rev is a string denoting the minimum version of ruby suitable
+# * *dependencies is an array of libraries which are required
+def check_dependencies(required_rev,*dependencies)
   puts "Checking dependencies" if EnvVars.instance["echo"]
   depsok=true  #assume we will not fail dependencies
+
+  required_rev=required_rev.split('.')
+  ruby_rev=RUBY_VERSION.split('.')
+  items=ruby_rev.length < required_rev.length ? ruby_rev.length : required_rev.length
+
+  for i in 1..items do
+    if ruby_rev[i]<required_rev[i]
+      puts
+      puts "Zabcon requires Ruby version #{required_rev.join('.')} or higher."
+      puts "you are using Ruby version #{RUBY_VERSION}."
+      puts
+      exit(1)
+    end
+  end
 
   #Convert the inbound array to a hash
   deps = Hash[*dependencies.collect { |v|

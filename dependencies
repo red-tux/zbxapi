@@ -13,7 +13,7 @@ Zabcon.
     Zabbix 1.7 introduced the API which Zabcon uses.
     In 1.8.1 the API version changed to 1.1 which is now a minimum requirement
 
-2. Ruby
+2. Ruby > 1.8.6
   --  http://www.ruby-lang.org
   Quite obviously, Ruby is needed for Zabcon.
   Ruby package is available in most distributions.

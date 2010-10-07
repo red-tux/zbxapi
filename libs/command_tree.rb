@@ -259,7 +259,7 @@ class CommandTree
         if !@children.empty? then
           @children.each { |node| node.do_insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options,depth+1)}
         else
-          raise Command_Tree_Exception "Unable to find insert point in Command Tree"
+          raise(Command_Tree_Exception,"Unable to find insert point in Command Tree")
         end
       end
     end
