@@ -50,7 +50,9 @@ module ZDebug
   # level - level to show message (Integer)
   # variable - variable to show (Object)
   # message - message to be prepended before variable  (String)
-  def debug(level,variable="",message=nil,truncate=nil)
+  # overload - do show or error if debug_level is not set
+  def debug(level,variable="",message=nil,truncate=nil,overload=false)
+    return if overload
     raise "Call set_debug before using debug" if !defined?(@@debug_level)
     if level<=@@debug_level
       #parse the caller array to determine who called us, what line, and what file

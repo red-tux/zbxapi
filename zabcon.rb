@@ -112,7 +112,8 @@ class ZabconApp
     @opts.parse!(ARGV)
     puts RUBY_PLATFORM if EnvVars.instance["echo"]
 
-    check_dependencies("1.8.6","parseconfig", "json", "highline")
+    #check_dependencies("1.8.6","parseconfig", "json", "highline")
+    check_dependencies("0.0.0","parseconfig", "json", "highline")
 
 #    p @options
     if @options.help.nil?

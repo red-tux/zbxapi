@@ -63,7 +63,9 @@ class ZabconCore
     @printer=OutputPrinter.new
     @commands=nil
     @setvars={}
+    debug(5,"Setting up help")
     @cmd_help=CommandHelp.new("english")  # Setup help functions, determine default language to use
+    debug(5,"Setting up ArgumentProcessor")
     @arg_processor=ArgumentProcessor.new  # Need to instantiate for debug routines
     if options.configfile.nil?
       @conffile="zabcon.conf"
@@ -71,6 +73,7 @@ class ZabconCore
       @conffile=options.configfile
       do_load_config(options)
     end
+    debug(5,"Setting up prompt")
     @debug_prompt=false
     if @env["have_tty"]
       prc=Proc.new do
@@ -86,11 +89,13 @@ class ZabconCore
     else
       @input=STDIN_Input.new
     end
+    debug(5,"Setup complete")
   end
 
   # Argument logged in is used to determine which set of commands to load. If loggedin is true then commands which
   # require a valid login are loaded
   def setupcommands(loggedin)
+    debug(5,loggedin,"Starting setupcommands (loggedin)")
 
     @commands=Parser.new(@arg_processor.default)
 
@@ -129,6 +134,7 @@ class ZabconCore
     @commands.insert "unset", "var", self.method(:unset_var), no_args, no_help, @arg_processor.method(:array_processor), :suppress_printer
 
     if loggedin then
+      debug(5,"Inserting commands which require login")
       # This command tree is for a valid login
       @commands.insert "", "raw", no_cmd
       @commands.insert "", "add", no_cmd
@@ -170,6 +176,7 @@ class ZabconCore
 
       @commands.insert "update", "user", @server.method(:updateuser), no_args, no_help, no_verify
     else
+      debug(5,"Inserting commands which do not require login")
       # This command tree is for no login
       @commands.insert "", "add", no_cmd
       @commands.insert "", "delete", no_cmd
@@ -207,6 +214,7 @@ class ZabconCore
   end
 
   def start
+    debug(5,"Entering main zabcon start routine")
     puts "Welcome to Zabcon."  if @env["echo"]
     puts "Use the command 'help' to get help on commands" if @env["have_tty"] || @env["echo"]
 

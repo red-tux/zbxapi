@@ -58,8 +58,7 @@ class CommandHelp
   # The lambda behaves as a default help function looking up the passed in symbol in the help file
   # If the command is found but no help exists, a message stating this is printed
   def method(sym)
-    debug(8,"CommandHelp.method overload")
-    debug(8,sym,"Arg")
+    debug(8,sym,"CommandHelp.method overload (sym)")
     methods=self.methods
     index=methods.index(sym.to_s)
     if !index.nil?
