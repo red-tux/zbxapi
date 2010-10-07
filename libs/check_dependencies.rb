@@ -46,6 +46,8 @@ def check_dependencies(required_rev,*dependencies)
       puts "you are using Ruby version #{RUBY_VERSION}."
       puts
       exit(1)
+    elsif ruby_rev[i]>required_rev[i]
+      break
     end
   end
 

@@ -61,7 +61,7 @@ class CommandHelp
     debug(8,"CommandHelp.method overload")
     debug(8,sym,"Arg")
     methods=self.methods
-    index=methods.find_index(sym.to_s)
+    index=methods.index(sym.to_s)
     if !index.nil?
       method=o_method(sym)
     else

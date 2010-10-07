@@ -60,7 +60,6 @@ class ArgumentProcessor
     quoted=false
     endquote=''
 
-p str.methods.sort
     str.each_char{|char|
       if quoted
         if char==endquote
