@@ -39,7 +39,7 @@ def check_dependencies(required_rev,*dependencies)
   ruby_rev=RUBY_VERSION.split('.')
   items=ruby_rev.length < required_rev.length ? ruby_rev.length : required_rev.length
 
-  for i in 1..items do
+  for i in 0..items-1 do
     if ruby_rev[i]<required_rev[i]
       puts
       puts "Zabcon requires Ruby version #{required_rev.join('.')} or higher."
