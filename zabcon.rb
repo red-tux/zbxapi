@@ -45,6 +45,21 @@ require path+'libs/defines'
 require path+"libs/check_dependencies"
 require path+'libs/zabcon_globals'
 
+if RUBY_VERSION=="1.8.6"  #Ruby 1.8.6 lacks the each_char function in the string object, so we add it here
+  String.class_eval do
+    def each_char
+      if block_given?
+        scan(/./m) do |x|
+          yield x
+        end
+      else
+        scan(/./m)
+      end
+    end
+  end
+end
+
+
 class ZabconApp
 
   def initialize
@@ -112,7 +127,7 @@ class ZabconApp
     @opts.parse!(ARGV)
     puts RUBY_PLATFORM if EnvVars.instance["echo"]
 
-    check_dependencies("1.8.7","parseconfig", "json", "highline")
+    check_dependencies("1.8.6","parseconfig", "json", "highline")
     #check_dependencies("0.0.0","parseconfig", "json", "highline")
 
     path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"  #TODO: make this less clugey
