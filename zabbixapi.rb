@@ -78,7 +78,7 @@ class ZabbixAPI
   # A connection however will not have been made, to actually connect to the Zabbix server use the login method
   def initialize(url,debug_level=0)
     set_debug_level(debug_level)
-    @orig_url=url  #save the origional url
+    @orig_url=url  #save the original url
     @url=URI.parse(url+'/api_jsonrpc.php')
     @user = ZbxAPI_User.new(self)
     @usergroup = ZbxAPI_UserGroup.new(self)
