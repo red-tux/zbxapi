@@ -205,7 +205,7 @@ class ArgumentProcessor
       debug(9,item,"parsing")
       item.lstrip!
       item.chomp!
-      if item =~ /^(.*?)=("(.+)"|([^"]+))/ then
+      if item =~ /^(.*?)=(.*?)$/ then
         lside=Regexp.last_match(1)
         rside=convert_or_parse(Regexp.last_match(2))
 
@@ -213,10 +213,10 @@ class ArgumentProcessor
           lside=Regexp.last_match(1)
         end
 
-        retval.merge!(lside=>rside)
-      elsif item =~ /(.*?)=""/ then
-        lside=Regexp.last_match(1)
-        rside=""
+        if rside =~ /\{(.*)\}/
+          rside=params_to_hash(Regexp.last_match(1))
+        end
+
         retval.merge!(lside=>rside)
       else
          if item =~ /^"(.*?)"$/
