@@ -62,20 +62,20 @@ class CommandHelp
     methods=self.methods
     index=methods.index(sym.to_s)
     if !index.nil?
-      method=o_method(sym)
+      method_local=o_method(sym)
     else
-      method=lambda do
+      method_local=lambda do |not_used|  #not_used is here due to zabcon_globals and callbacks. 
         debug(6, sym, "auto generated help func for")
         item=@doc.elements["//item[@command='#{sym.to_s}']"]
         if item.nil?
           puts "Help not available for internal command: #{sym.to_s}"
-	else
-	  puts item.text
-	end
+	      else
+	        puts item.text
+	      end
       end
     end
-    debug(8,method,"returning")
-    method
+    debug(8,method_local,"returning")
+    method_local
   end
 
   def help(command_tree,input)
@@ -99,7 +99,7 @@ class CommandHelp
         cmd=command_tree.search(help_cmd)[0]  #search returns an array
 
         if !cmd.helpproc.nil?
-          cmd.helpproc.call
+          cmd.helpproc.call(nil)  #TODO: need to fix, see line 67 above
         else
           puts "Unable to find help for \"#{help_cmd}\""
         end
