@@ -18,6 +18,12 @@ Zabcon.
   Quite obviously, Ruby is needed for Zabcon.
   Ruby package is available in most distributions.
 
+  Or
+
+  Ruby > 1.9   **READ NOTE BELOW**
+  If you are using Ruby 1.9 or greater you must have readline support compiled in.
+  If you do not you will receive a dependency error message.
+
 3. Ruby gem
   --  http://rubygems.org/
   Must be installed from source on CentOS 5.3
