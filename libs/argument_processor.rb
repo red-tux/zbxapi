@@ -201,6 +201,7 @@ class ArgumentProcessor
     debug(6,line,"line")
     params=safe_split(line)
     debug(6,params,"After safe_split")
+
     retval = {}
     params.each do |item|
       debug(9,item,"parsing")
@@ -213,6 +214,8 @@ class ArgumentProcessor
           rside.collect! do |i|
             if i =~ /\{(.*)\}/
               params_to_hash(Regexp.last_match(1))
+            else
+              convert_or_parse(i)
             end
           end
         end
@@ -226,7 +229,7 @@ class ArgumentProcessor
         end
 
         if rside =~ /\[(.*)\]/
-          p Regexp.last_match(1)
+          Regexp.last_match(1)
           rside=[params_to_hash(Regexp.last_match(1))]
         end
 
@@ -738,27 +741,26 @@ end
 
 
 if __FILE__ == $0
+
+  #If we don't have the each_char method for the string class include the module that has it.
+  if !String.method_defined?("each_char")
+    require 'jcode'
+  end
+
+  require 'pp'
+
   include ZDebug
   set_debug_level(1)
   arg_processor=ArgumentProcessor.new
 
-  p arg="This is an argument"
-  p arg_processor.params_to_hash(arg)
+  p arg='i1=2 i2=item i3="this is a short sentence" i4="a string with a \" char"'
+  pp arg_processor.params_to_hash(arg),"----"
 
-  p arg='"this is another argument" and some words'
-  p arg_processor.params_to_hash(arg)
-
-  p arg='"this is a quote \" now we close it" closed'
-  p arg_processor.params_to_hash(arg)
-  
-  p arg='item=2 second=item third="this is a short sentence"'
-  p arg_processor.params_to_hash(arg)
-
-  p arg='blank=""'
-  p arg_processor.params_to_hash(arg)
+  p arg='one=-2 two="" three=1,2 four=[1,2,three]'
+  pp arg_processor.params_to_hash(arg),"----"
 
   p arg='hosts=[{hostid=10017}] name="zzz"'
-  p arg_processor.params_to_hash(arg)
+  pp arg_processor.params_to_hash(arg)
 end
 
 

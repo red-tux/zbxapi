@@ -248,15 +248,15 @@ class ZabbixAPI
 #    http.start do |http|
       headers={'Content-Type'=>'application/json-rpc',
         'User-Agent'=>'Zbx Ruby CLI'}
-      debug(8,"Sending: #{json_obj}")
+      debug(4,"Sending: #{json_obj}")
       response = http.post(@url.path, json_obj,headers)
       if response.code=="301"
         puts "Redirecting to #{response['location']}"
         @url=URI.parse(response['location'])
 				raise Redirect
       end
-      debug(8,"Response Code: #{response.code}")
-      debug(8,response.body,"Response Body",5000)
+      debug(4,"Response Code: #{response.code}")
+      debug(4,response.body,"Response Body",5000)
 #    end
 
       @id+=1  # increment the ID value for the API call
@@ -472,12 +472,12 @@ class ZbxAPI_Host < ZbxAPI_Sub
   #Accepts a single host id or an array  of host id's to be deleted
   def delete(ids)
     checkauth
-    checkversion(1,1)
+    checkversion(1,3)
 
     if ids.class==Fixnum
-      hostids=[{'hostid'=>ids}]
+      hostids=[ids]
     elsif ids.class==Array
-      hostids=ids.collect {|id| {'hostid'=>id} }
+      hostids=ids
     else
       raise ZbxAPI_ParameterError, "host.delete parameter must be number or array"
     end

@@ -137,6 +137,15 @@ class ZabconApp
       exit
     end
 
+    #If we don't have the each_char method for the string class include the module that has it.
+    if !String.method_defined?("each_char")
+      begin
+        require 'jcode'
+      rescue LoadError
+        puts "Module jcode is required for your version of Ruby"
+      end
+    end
+
     path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"  #TODO: make this less clugey
     require path+'libs/zabcon_core'   #Require placed after deps check
 
