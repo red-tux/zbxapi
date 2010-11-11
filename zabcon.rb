@@ -127,8 +127,15 @@ class ZabconApp
     @opts.parse!(ARGV)
     puts RUBY_PLATFORM if EnvVars.instance["echo"]
 
-    check_dependencies("1.8.6","parseconfig", "json", "highline","readline")
+    check_dependencies("1.8.6","parseconfig", "json", "highline")
     #check_dependencies("0.0.0","parseconfig", "json", "highline")
+
+    begin
+      require 'readline'
+    rescue LoadError
+      puts "Readline support was not compiled into Ruby.  Readline support is required."
+      exit
+    end
 
     path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"  #TODO: make this less clugey
     require path+'libs/zabcon_core'   #Require placed after deps check
