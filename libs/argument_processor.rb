@@ -195,11 +195,12 @@ class ArgumentProcessor
   # if items are found inside quotes they will be treated as one unit
   # If items are found individually (not quoted) it will be put in a hash as the
   # left side with a value of true
+  #
+  # TODO this could use some cleanup.
   def params_to_hash(line)
     debug(6,line,"line")
     params=safe_split(line)
     debug(6,params,"After safe_split")
-
     retval = {}
     params.each do |item|
       debug(9,item,"parsing")
@@ -208,6 +209,13 @@ class ArgumentProcessor
       if item =~ /^(.*?)=(.*?)$/ then
         lside=Regexp.last_match(1)
         rside=convert_or_parse(Regexp.last_match(2))
+        if rside.class==Array  #check to see if we have hashes inside the array
+          rside.collect! do |i|
+            if i =~ /\{(.*)\}/
+              params_to_hash(Regexp.last_match(1))
+            end
+          end
+        end
 
         if lside =~ /^"(.*?)"$/
           lside=Regexp.last_match(1)
@@ -215,6 +223,11 @@ class ArgumentProcessor
 
         if rside =~ /\{(.*)\}/
           rside=params_to_hash(Regexp.last_match(1))
+        end
+
+        if rside =~ /\[(.*)\]/
+          p Regexp.last_match(1)
+          rside=[params_to_hash(Regexp.last_match(1))]
         end
 
         retval.merge!(lside=>rside)
@@ -728,6 +741,7 @@ if __FILE__ == $0
   include ZDebug
   set_debug_level(1)
   arg_processor=ArgumentProcessor.new
+
   p arg="This is an argument"
   p arg_processor.params_to_hash(arg)
 
@@ -741,6 +755,9 @@ if __FILE__ == $0
   p arg_processor.params_to_hash(arg)
 
   p arg='blank=""'
+  p arg_processor.params_to_hash(arg)
+
+  p arg='hosts=[{hostid=10017}] name="zzz"'
   p arg_processor.params_to_hash(arg)
 end
 
