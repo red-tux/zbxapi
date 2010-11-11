@@ -61,7 +61,7 @@ class ZError < RuntimeError
       puts
     else
       if !@message.nil?
-        @message.each {|line|
+        @message.each_line {|line|
           puts "** #{line}"
         }
         puts
