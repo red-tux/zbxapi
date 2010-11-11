@@ -111,12 +111,12 @@ class ArgumentProcessor
         convert_or_parse(i)
       end
       return results
-    elsif item.downcase=="true" || item.downcase=="false"
+    elsif item.class==String && (item.downcase=="true" || item.downcase=="false")
       return true if item.downcase=="true"
       return false
     else
       array=safe_split(item,',')
-      if array.length<=1
+      if !array.nil? && array.length<=1
         return item
       else
         return array
@@ -474,13 +474,13 @@ class ArgumentProcessor
 
     #TODO, add the ability for both groups and groupids
 
-    valid_parameters=['host', 'groupids', 'port', 'status', 'useip', 'dns', 'ip',
+    valid_parameters=['host', 'groups', 'port', 'status', 'useip', 'dns', 'ip',
                        'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
-                       'ipmi_privilege', 'ipmi_username', 'ipmi_password']
+                       'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'templates']
 
     parameters=default_processor(help_func,valid_parameters,args,user_vars,options)[:api_params]
 
-    required_parameters=[ 'host', 'groupids' ]
+    required_parameters=[ 'host', 'groups' ]
 
 #    p required_parameters
 #    p parameters

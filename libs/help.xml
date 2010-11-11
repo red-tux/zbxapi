@@ -134,9 +134,9 @@ raw json          - Allows for raw json calls to the API, this allows for a
 Add Host adds a host to the Zabbix server.
 
 Required arguments:
-  host, port, ip and/or dns, status, proxy_hostid, groupids, useip
+  host, port, ip and/or dns, status, proxy_hostid, groups, useip
 Optional arguments:
-  available, disable_until, status,
+  available, disable_until, status, templates
   maintenanceid, maintenance_from, maintenance_status, maintenance_type,
   useipmi, ipmi_authtype, ipmi_available, ipmi_disable_until, ipmi_errors_from,
   ipmi_ip, ipmi_password, ipmi_port, ipmi_privilege, ipmi_username,
@@ -144,7 +144,11 @@ Optional arguments:
   outbytes, error, lastaccess, errors_from, inbytes
 
 example:
-  add host host=servername dns=host.dom port=10050 proxy_hostid=0 groups=1 useip=0
+  add host host=servername dns=host.dom port=10050 proxy_hostid=0 groups=[{groupid=1}] useip=0
+
+  Adding a host to a template:
+  add host host=servername dns=host.dom port=10050 proxy_hostid=0 groups=[{groupid=1}] useip=0 templates=[{templateid=10001}]
+
   </item>
 
 <!-- 80 Col Marker ######################################################## -->
