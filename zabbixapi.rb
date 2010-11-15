@@ -96,7 +96,7 @@ class ZabbixAPI
     debug(6,"query: #{@url.query}, fragment: #{@url.fragment}")
   end
 
-  #wraps the givn information into the appropriate JSON object
+  #wraps the given information into the appropriate JSON object
   #* method is a string
   #* params is a hash of the parameters for the method to be called
   #Returns a hash representing a Zabbix API JSON call
@@ -221,8 +221,8 @@ class ZabbixAPI
     obj=do_request(json_obj(method,params))
     return obj['result']
   end
-  
-  # Function to test weather or not a function will work with the current API version of the server
+
+  # Function to test whether or not a function will work with the current API version of the server
   # If no options are presented the major and minor are assumed to be the minimum version
   # number suitable to run the function
   # Does not explicitly return anything, but raises ZbxAPI_ExceptionVersion if there is a problem
@@ -378,7 +378,7 @@ class ZbxAPI_User < ZbxAPI_Sub
   # may be removed in future versions
   
   def add(options)
-    puts "WARNING API Function User.add will is deprecated and will be removed in the future without further warning"
+    puts "WARNING API Function User.add is deprecated and will be removed in the future without further warning"
     create(options)
   end
 
@@ -693,7 +693,7 @@ class ZbxAPI_Application < ZbxAPI_Sub
 
   # Alias function for code written against 1.0 API
   def add(options={})
-    puts "WARNING API Function Application.add will is deprecated and will be removed in the future without further warning"
+    puts "WARNING API Function Application.add is deprecated and will be removed in the future without further warning"
     create(options)
   end
 
@@ -754,7 +754,7 @@ class ZbxAPI_Trigger < ZbxAPI_Sub
 
   # Alias function for code written against 1.0 api
   def add(options={})
-    puts "WARNING API Function Trigger.add will is deprecated and will be removed in the future without further warning"
+    puts "WARNING API Function Trigger.add is deprecated and will be removed in the future without further warning"
     create(options)
   end
 end
@@ -782,7 +782,7 @@ class ZbxAPI_Sysmap < ZbxAPI_Sub
 
   # Alias function for code written against 1.0 API
   def add(options={})
-    puts "WARNING API Function Sysmap.add will is deprecated and will be removed in the future without further warning"
+    puts "WARNING API Function Sysmap.add is deprecated and will be removed in the future without further warning"
     create(options)
   end
 
@@ -877,7 +877,7 @@ zbx_api.debug_level=0
 
 
 puts
-puts "Getting by username, admin, number should  be seen"
+puts "Getting by username, admin, number should be seen"
 p zbx_api.user.getid('admin')
 puts "Trying a bogus username"
 p zbx_api.user.getid('bogus')
@@ -905,7 +905,7 @@ puts "getting items"
 p zbx_api.item.get
 
 puts
-puts "getting itsms by host"
+puts "getting items by host"
 puts "host: #{hosts.values[0]}"
 p items=zbx_api.item.get({'hostids'=>hosts.values[0]})
 
