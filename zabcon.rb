@@ -70,37 +70,40 @@ class ZabconApp
     @options=OpenStruct.new
 #    @options.debug=0
 
+
     @opts = OptionParser.new do |opts|
-      opts.banner = "Usage: #{$0} [options]"
+      opts.banner = "Usage: #{$0} [options] [command file]"
       opts.separator "------------------------------------"
       opts.separator ""
+      opts.separator "If command file is specified Zabcon will read from the file"
+      opts.separator "line by line and execute the commands in order.  If '-' is "
+      opts.separator "used, Zabcon will read from stdin as though it were a file."
+      opts.separator ""
       opts.separator "Options"
-      opts.on("-h","--help","Display this help message") do
+      opts.on("-h", "-?", "--help", "Display this help message") do
         EnvVars.instance["echo"]=false
-        @options.help=true
+        @options.help           =true
         puts opts
       end
-      opts.on("-l","--load [file]","load configuration file supplied or default if none") do |file|
+      opts.on("-l", "--load [file]", "load configuration file supplied or ","default if none") do |file|
         if file.nil?
           @options.configfile="zabcon.conf"
         else
           @options.configfile=file
         end
       end
-      opts.on("-d","--debug LEVEL",Integer,"Specify debug level (Overrides config file)") do |level|
+      opts.on("-d", "--debug LEVEL", Integer, "Specify debug level (Overrides config","file)") do |level|
         @options.debug=level
       end
-      opts.on("-e","--echo [on/off]", "Turn startup echo on or off.  Default on") do |echo|
-        if echo.nil?
-          EnvVars.instance["echo"]=true
-        elsif echo.downcase=="on"
-          EnvVars.instance["echo"]=true
-        elsif echo.downcase=="off"
-          EnvVars.instance["echo"]=false
-        else
-          puts "Invalid value for echo received: #{echo}"
-          exit(1)
-        end
+      opts.on("-e", "--[no-]echo", "Enable startup echo.  Default is on ","for interactive") do |echo|
+        EnvVars.instance["echo"]=echo
+      end
+      opts.on("-s", "--separator CHAR", "Seperator character for csv styple output.",
+              "Use \\t for tab separated output.") do |sep|
+        EnvVars.instance["table_separator"]=sep
+      end
+      opts.on("--no-header", "Do not show headers on output.") do
+        EnvVars.instance["table_header"]=false
       end
     end
   end
@@ -119,12 +122,30 @@ class ZabconApp
     env["logged_in"]=false
     env["have_tty"]=STDIN.tty?
     EnvVars.instance["echo"]=STDIN.tty? ? true: false
+
+    #output related environment variables
+    env["table_output"]=STDIN.tty?   # Is the output a well formatted table, or csv like?
+    env["table_header"]=true
+    env["table_separator"]=","
    end
 
   def run
 #    p ARGV
     setup_globals
-    @opts.parse!(ARGV)
+    begin
+      @opts.parse!(ARGV)
+    rescue OptionParser::InvalidOption  => e
+      puts e
+      puts
+      puts @opts
+      exit(1)
+    rescue OptionParser::InvalidArgument => e
+      puts e
+      puts
+      puts @opts
+      exit(1)
+    end
+
     puts RUBY_PLATFORM if EnvVars.instance["echo"]
 
     check_dependencies("1.8.6","parseconfig", "json", "highline")

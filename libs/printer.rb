@@ -269,7 +269,7 @@ class OutputPrinter
 
     debug(6,type,"Array type")
 
-    puts "#{dataset[:class].to_s.capitalize} result set"
+    puts "#{dataset[:class].to_s.capitalize} result set"  if EnvVars.instance["echo"]
 
     if results.length==0
       puts "Result set empty"
@@ -316,8 +316,8 @@ class OutputPrinter
         printline(widths)
         puts "#{results.length} rows total"
       else
-        printheader(header,nil) if EnvVars.instance["table_header"]
-        results.each { | row| printrow(row,header,nil) }
+        printheader(header,nil,EnvVars.instance["table_separator"]) if EnvVars.instance["table_header"]
+        results.each { | row| printrow(row,header,nil,EnvVars.instance["table_separator"]) }
       end
 
 
