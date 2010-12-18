@@ -225,7 +225,7 @@ class OutputPrinter
       header.each do |value|
         output+="#{value}#{separator}"
       end
-      output.chop!
+      separator.length.times {output.chop!}
     else
       output="|"
       header.each_with_index do |value, index|
@@ -248,7 +248,7 @@ class OutputPrinter
       order.each_with_index do |value, index|
         output+="#{row[value]}#{separator}"
       end
-      output.chop!  if separator.length>0   #remove the last character, a separator
+      separator.length.times { output.chop! }  #remove the last separator
       puts output
     else
       output="|"
