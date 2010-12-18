@@ -214,21 +214,49 @@ class OutputPrinter
     puts output
   end
 
-  def printheader(header, widths)
-    output="|"
-    widths.each_with_index do |value, index|
-      output+=" %-#{widths[index]}s |" % header[index]
+  #Prints the table header
+  #header: Array of strings in the print order for the table header
+  #order: Array of strings denoting output order
+  #widths: (optional) Array of numbers denoting the width of each field
+  #separator: (optional) Separator character
+  def printheader(header, widths=nil, separator=",")
+    if widths.nil?
+      output=""
+      header.each do |value|
+        output+="#{value}#{separator}"
+      end
+      output.chop!
+    else
+      output="|"
+      header.each_with_index do |value, index|
+        output+=" %-#{widths[index]}s |" % value
+      end
     end
     puts output
     pause? 1
   end
 
-  def printrow(row, order, widths)
-    output="|"
-    order.each_with_index do |value, index|
-      output+=" %-#{widths[index]}s |" % format_for_print(row[value])
+  #Requires 2 arguments and 2 optional arguments
+  #row: The Row of data
+  #order: An array of field names with the order in which they are to be printed
+  #Optional arguments
+  #widths: An array denoting the width of each field, if nul a table separated by separator will be printed
+  #separator: the separator character to be used
+  def printrow(row, order, widths=nil, separator=',')
+    if widths.nil?
+      output=""
+      order.each_with_index do |value, index|
+        output+="#{row[value]}#{separator}"
+      end
+      output.chop!  if separator.length>0   #remove the last character, a separator
+      puts output
+    else
+      output="|"
+      order.each_with_index do |value, index|
+        output+=" %-#{widths[index]}s |" % format_for_print(row[value])
+      end
+      puts output
     end
-    puts output
     pause? 1
   end
 
@@ -278,12 +306,20 @@ class OutputPrinter
 
       widths=getcolwidth(results,header)
 
-      printline(widths)
-      printheader(header,widths)
-      printline(widths)
-      results.each { |row| printrow(row,header,widths) }
-      printline(widths)
-      puts "#{results.length} rows total"
+      if EnvVars.instance["table_output"]
+        if EnvVars.instance["table_header"]
+          printline(widths)
+          printheader(header,widths)
+        end
+        printline(widths)
+        results.each { |row| printrow(row,header,widths) }
+        printline(widths)
+        puts "#{results.length} rows total"
+      else
+        printheader(header,nil) if EnvVars.instance["table_header"]
+        results.each { | row| printrow(row,header,nil) }
+      end
+
 
     else
       debug(7,"Results type is not Hash, assuming array")
