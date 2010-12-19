@@ -45,15 +45,11 @@ class ZabconCore
 
   include ZDebug
 
-  def initialize(options)
-    # This must be set first or the debug module will throw an error
-    if (options.debug.nil?)
-      set_debug_level(0)
-    else
-      set_debug_level(options.debug)
-    end
-
+  def initialize()
     @env = EnvVars.instance  # make it easier to call the global EnvVars singleton
+
+    # This must be set first or the debug module will throw an error
+    set_debug_level(@env["debug"])
 
     @env.register_notifier("debug",self.method(:set_debug_level))
     @env.register_notifier("api_debug",self.method(:set_debug_api_level))
@@ -67,12 +63,12 @@ class ZabconCore
     @cmd_help=CommandHelp.new("english")  # Setup help functions, determine default language to use
     debug(5,"Setting up ArgumentProcessor")
     @arg_processor=ArgumentProcessor.new  # Need to instantiate for debug routines
-    if options.configfile.nil?
-      @conffile="zabcon.conf"
-    else
-      @conffile=options.configfile
-      do_load_config(options)
+
+    if !@env["server"].nil? and !@env["username"].nil? and !@env["password"].nil? then
+      puts "Found valid login credentials, attempting login"  if @env["echo"]
+      do_login({:server=>@env["server"], :username=>@env["username"],:password=>@env["password"]})
     end
+
     debug(5,"Setting up prompt")
     @debug_prompt=false
     if @env["have_tty"]
@@ -123,7 +119,7 @@ class ZabconCore
     @commands.insert "", "set", no_cmd
     @commands.insert "", "show", no_cmd
     @commands.insert "", "unset", no_cmd
-    @commands.insert "load", "config", self.method(:do_load_config),no_args,no_help,no_verify,:suppress_printer
+    @commands.insert "load", "config", @env.method(:load_config),no_args,no_help,no_verify,:suppress_printer
     @commands.insert "set", "debug", self.method(:set_debug),no_args,no_help,no_verify,:suppress_printer
     @commands.insert "set", "lines", self.method(:set_lines),no_args,no_help,no_verify,:suppress_printer
     @commands.insert "set", "pause", self.method(:set_pause),no_args,no_help,no_verify,:suppress_printer
@@ -407,73 +403,6 @@ class ZabconCore
   #    stored in the file
   # 2) A Hash with a key :filename
   # 3) If nil or empty the class variable @conffile will be used
-  def do_load_config(params)
-    debug(6,params)
-
-    #Setup a local OpenStruct to copy potentially passed in OpenStruct
-    #rather than query every time weather or not params is an OpenStruct
-    localoptions=OpenStruct.new
-
-    env=EnvVars.instance  # Instantiate the global EnvVars
-
-    if params.nil? or params.empty?  # nil or empty, use conffile
-      fname=@conffile
-    elsif params.class==OpenStruct   # use OpenStruct value or conffile
-      if params.configfile.nil?
-        fname=@conffile
-      else
-        fname=params.configfile
-        localoptions=params  # Since we have an OpenStruct passed in let's setup
-                             # our local OpenStruct variable for use later
-      end
-    elsif params.class==Hash  # use Hash[:filename] or raise an exception
-      if params[:filename].nil?
-        raise ZabconError.new("Expected a hash with the key 'filename'")
-      else
-        fname=params[:filename]
-      end
-    else  # If we get here something went wrong.
-      raise ZabconError.new("OH NO!!!  Received something unexpected in do_load_config.  Try again with debug level 6.")
-    end
-
-    begin
-      config=ParseConfig.new(fname).params
-      debug(1,config)
-
-      if !config["debug"].nil?
-        # If the command line option debug was not passed in use the config file
-        env["debug"]=config["debug"].to_i if localoptions.debug.nil?
-      end
-
-      if !config["server"].nil? and !config["username"].nil? and !config["password"].nil? then
-        do_login({:server=>config["server"], :username=>config["username"],:password=>config["password"]})
-      else
-        puts "Missing one of the following, server, username or password or bad syntax"
-      end
-
-      if !config["lines"].nil?
-        env["sheight"]=config["lines"].to_i
-      end
-
-      if !config["language"].nil?
-        env["language"]=config["language"]
-      end
-
-    rescue Errno::EACCES
-      puts "Unable to open file #{fname}"
-    rescue ZbxAPI_GeneralError => e
-      puts "An error was received from the Zabbix server"
-      if e.message.class==Hash
-        puts "Error code: #{e.message["code"]}"
-        puts "Error message: #{e.message["message"]}"
-        puts "Error data: #{e.message["data"]}"
-        retry
-      else
-        puts "Error: #{e.message}"
-        e.attempt_retry
-      end
-    end
-  end
 
   def do_login(params)
     url = params[:server]

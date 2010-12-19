@@ -42,7 +42,7 @@ require 'optparse'
 require 'ostruct'
 require path+'libs/zdebug'
 require path+'libs/defines'
-require path+"libs/check_dependencies"
+#require path+"libs/check_dependencies"
 require path+'libs/zabcon_globals'
 
 if RUBY_VERSION=="1.8.6"  #Ruby 1.8.6 lacks the each_char function in the string object, so we add it here
@@ -67,7 +67,7 @@ class ZabconApp
   end
 
   def setup_opt_parser
-    @options=OpenStruct.new
+    @cmd_opts=OpenStruct.new
 #    @options.debug=0
 
 
@@ -81,29 +81,28 @@ class ZabconApp
       opts.separator ""
       opts.separator "Options"
       opts.on("-h", "-?", "--help", "Display this help message") do
-        EnvVars.instance["echo"]=false
-        @options.help           =true
+        @cmd_opts.echo=false
+        @cmd_opts.help=true
         puts opts
       end
-      opts.on("-l", "--load [file]", "load configuration file supplied or ","default if none") do |file|
-        if file.nil?
-          @options.configfile="zabcon.conf"
-        else
-          @options.configfile=file
-        end
+      opts.on("-l", "--load FILE", "load configuration file supplied or ","default if none") do |file|
+        @cmd_opts.config_file=file
+      end
+      opts.on("--no-config", "Do not attempt to automatically load","the configuration file") do
+        @cmd_opts.load_config=false
       end
       opts.on("-d", "--debug LEVEL", Integer, "Specify debug level (Overrides config","file)") do |level|
-        @options.debug=level
+        @cmd_opts.debug=level
       end
       opts.on("-e", "--[no-]echo", "Enable startup echo.  Default is on ","for interactive") do |echo|
-        EnvVars.instance["echo"]=echo
+        @cmd_opts.echo=echo
       end
       opts.on("-s", "--separator CHAR", "Seperator character for csv styple output.",
               "Use \\t for tab separated output.") do |sep|
-        EnvVars.instance["table_separator"]=sep
+        @cmd_opts.table_separator=sep
       end
       opts.on("--no-header", "Do not show headers on output.") do
-        EnvVars.instance["table_header"]=false
+        @cmd_opts.table_header=false
       end
     end
   end
@@ -112,28 +111,82 @@ class ZabconApp
     env=EnvVars.instance  # we must instantiate a singleton before using it
     vars=GlobalVars.instance
 
-    env["debug"]=( @options.debug.nil? ? 0 : @options.debug )
+    env["debug"]=0
     env["show_help"]=false
-    env["server"]=''
-    env["username"]=''
-    env["password"]=''
+    env["server"]=nil
+    env["username"]=nil
+    env["password"]=nil
     env["lines"]=24
     env["language"]="english"
     env["logged_in"]=false
     env["have_tty"]=STDIN.tty?
-    EnvVars.instance["echo"]=STDIN.tty? ? true: false
+    env["echo"]=STDIN.tty? ? true: false
+    env["config_file"]="zabcon.conf"
+    env["load_config"]=true
 
     #output related environment variables
     env["table_output"]=STDIN.tty?   # Is the output a well formatted table, or csv like?
     env["table_header"]=true
     env["table_separator"]=","
-   end
+
+  end
+
+  #checks to ensure all dependencies are available, forcefully exits with an
+  # exit code of 1 if the dependency check fails
+  # * ruby_rev is a string denoting the minimum version of ruby suitable
+  # * *dependencies is an array of libraries which are required
+  def check_dependencies(required_rev,*dependencies)
+    puts "Checking dependencies" if EnvVars.instance["echo"]
+    depsok=true  #assume we will not fail dependencies
+
+    required_rev=required_rev.split('.')
+    ruby_rev=RUBY_VERSION.split('.')
+    items=ruby_rev.length < required_rev.length ? ruby_rev.length : required_rev.length
+
+    for i in 0..items-1 do
+      if ruby_rev[i]<required_rev[i]
+        puts
+        puts "Zabcon requires Ruby version #{required_rev.join('.')} or higher."
+        puts "you are using Ruby version #{RUBY_VERSION}."
+        puts
+        exit(1)
+      elsif ruby_rev[i]>required_rev[i]
+        break
+      end
+    end
+
+    #Convert the inbound array to a hash
+    deps = Hash[*dependencies.collect { |v|
+      [v,true]
+    }.flatten]
+
+    deps.each_key {|dep|
+      val=Gem.source_index.find_name(dep).map {|x| x.name}==[]
+      puts " #{dep} : Not Installed" if val
+      depsok=false if val
+    }
+    if !depsok
+      puts
+      puts "One or more dependencies failed"
+      puts "Please see the dependencies file for instructions on installing the"
+      puts "required dependencies"
+      puts
+      exit(1)
+    end
+  end
+
 
   def run
-#    p ARGV
-    setup_globals
     begin
-      @opts.parse!(ARGV)
+      setup_globals          # step 1, set up the global environment variables
+      @opts.parse!(ARGV)     # step 2, parse the command line and setup the class variable @cmd_opts
+
+      h = @cmd_opts.marshal_dump()  #dump the hash to a temporary variable
+      cmd_hash={}
+      h.each_pair do |k,v|
+        cmd_hash[k.to_s]=v
+      end
+      EnvVars.instance.load_config(cmd_hash)
     rescue OptionParser::InvalidOption  => e
       puts e
       puts
@@ -171,8 +224,8 @@ class ZabconApp
     require path+'libs/zabcon_core'   #Require placed after deps check
 
 #    p @options
-    if @options.help.nil?
-      zabcon=ZabconCore.new(@options)
+    if @cmd_opts.help.nil?
+      zabcon=ZabconCore.new
       zabcon.start()
     end
   end
