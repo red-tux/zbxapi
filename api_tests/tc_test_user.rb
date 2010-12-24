@@ -32,11 +32,11 @@ class TC_Test_API_User < Test::Unit::TestCase
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    @server="http://localhost"
+    @server="http://localhost/1.8.4rc3"
     @api_user="apitest"
     @api_pass="apitest"
 
-    @zbx_api = ZabbixAPI.new(@server)
+    @zbx_api = ZabbixAPI.new(@server,4)
     @zbx_api.login(@api_user,@api_pass)
   end
 
@@ -65,8 +65,14 @@ class TC_Test_API_User < Test::Unit::TestCase
   end
 
   def test_02_addmedia
+    #12-24-2010  Bug in the following:
+    #https://support.zabbix.com/browse/ZBX-3340
+    #Ruby API Library also has a bug which needs to be fixed (parameter checks don't follow API documentation)
+    @zbx_api.debug_level=5
     assert_nothing_raised(ZbxAPI_GeneralError) do
-      result=@zbx_api.user.addmedia({"userid"=>@@test_user,"mediatypeid"=>1,"severity"=>"HS","active"=>true,"period"=>""})
+      result=@zbx_api.user.addmedia(
+          {"users"=>[{"userid"=>@@test_user}],
+           "medias"=>[{"active"=>2,"sendto"=>"me@me.com","severity"=>"123456"}]})
     end
   end
 
