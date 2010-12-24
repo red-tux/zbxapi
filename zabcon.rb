@@ -197,6 +197,11 @@ class ZabconApp
       puts
       puts @opts
       exit(1)
+    rescue OptionParser::MissingArgument => e
+      puts e
+      puts
+      puts @opts
+      exit(1)
     end
 
     puts RUBY_PLATFORM if EnvVars.instance["echo"]
