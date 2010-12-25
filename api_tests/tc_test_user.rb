@@ -32,11 +32,12 @@ class TC_Test_API_User < Test::Unit::TestCase
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    @server="http://localhost/1.8.4rc3"
-    @api_user="apitest"
-    @api_pass="apitest"
 
-    @zbx_api = ZabbixAPI.new(@server,4)
+    @server=$server.nil? ? "http://localhost/1.8.4rc3" : $server
+    @api_user=$api_user.nil? ? "apitest" : $api_user
+    @api_pass=$api_pass.nil? ? "apitest" : $api_pass
+
+    @zbx_api = ZabbixAPI.new(@server)
     @zbx_api.login(@api_user,@api_pass)
   end
 
@@ -68,7 +69,7 @@ class TC_Test_API_User < Test::Unit::TestCase
     #12-24-2010  Bug in the following:
     #https://support.zabbix.com/browse/ZBX-3340
     #Ruby API Library also has a bug which needs to be fixed (parameter checks don't follow API documentation)
-    @zbx_api.debug_level=5
+    #@zbx_api.debug_level=5
     assert_nothing_raised(ZbxAPI_GeneralError) do
       result=@zbx_api.user.addmedia(
           {"users"=>[{"userid"=>@@test_user}],

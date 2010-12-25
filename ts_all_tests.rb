@@ -27,12 +27,17 @@ $: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 require "test/unit"
 require "api_tests/tc_test_user"
+require "api_tests/tc_test_host"
 
+$server="http://localhost/"
+$api_user="apitest"
+$api_pass="apitest"
 
 class TS_All_Tests
    def self.suite
      suite = Test::Unit::TestSuite.new
      suite << TC_Test_API_User
+     suite << TC_Test_API_Host
      return suite
    end
  end
