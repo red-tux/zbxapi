@@ -29,7 +29,7 @@ require "test/unit"
 require "api_tests/tc_test_user"
 require "api_tests/tc_test_host"
 
-$server="http://localhost/"
+$server="http://localhost/1.8.4rc3"
 $api_user="apitest"
 $api_pass="apitest"
 

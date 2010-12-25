@@ -433,15 +433,19 @@ end
 #
 # Class ZbxAPI_Host
 #
-# Class encapsulating Host functions
+# Class encapsulating Host and template functions
 #
 # API Function          Status
-# get      Basic function implemented
+# get                   Basic function implemented
 # getid
-# create      Basic function implemented 20091020
+# create                Basic function implemented 20091020
 # update
 # massupdate
-# delete    Implimented
+# delete                Implimented
+#
+# template.create       implemented as host.create_template
+# template.get          implemented as host.get_template
+# template.delete       implemented as host.delete_template
 #
 #******************************************************************************
 
@@ -454,6 +458,14 @@ class ZbxAPI_Host < ZbxAPI_Sub
     obj['result']
   end
 
+  def get_template(options={})
+    checkauth
+    checkversion(1,3)
+
+    obj=do_request(json_obj('template.get',options))
+    obj['result']
+  end
+
   def create(options={})
     checkauth
     checkversion(1,1)
@@ -462,10 +474,12 @@ class ZbxAPI_Host < ZbxAPI_Sub
     obj['result']
   end
 
-  # Place holder for Code written against API 1.0
-  def add(options={})
-    puts "WARNING API Function Host.create is deprecated and will be removed in the future without further warning"
-    create(options)
+  def create_template(options={})
+    checkauth
+    checkversion(1,3)
+
+    obj=do_request(json_obj('template.create',options))
+    obj['result']
   end
 
   # http://www.zabbix.com/documentation/1.8/api/objects/host#hostdelete
@@ -474,16 +488,32 @@ class ZbxAPI_Host < ZbxAPI_Sub
     checkauth
     checkversion(1,3)
 
+    obj=do_request(json_obj('host.delete',delete_helper("hostid",ids)))
+    obj['result']
+  end
+
+  def delete_template(ids)
+    checkauth
+    checkversion(1,3)
+
+    obj=do_request(json_obj('template.delete',delete_helper("templateid",ids)))
+    obj['result']
+  end
+
+  private
+
+  def delete_helper(id_type,ids)
     if ids.class==Fixnum
-      hostids=[ids]
+      ids=[ids]
     elsif ids.class==Array
-      hostids=ids
+      ids=ids
     else
-      raise ZbxAPI_ParameterError, "host.delete parameter must be number or array"
+      raise ZbxAPI_ParameterError, "ids parameter must be number or array"
     end
 
-    obj=do_request(json_obj('host.delete',hostids))
-    obj['result']
+    ids.map do |id|
+      {id_type=>id}
+    end
   end
 
 end
