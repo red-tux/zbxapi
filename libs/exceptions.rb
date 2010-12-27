@@ -79,8 +79,8 @@ class ZError < RuntimeError
     end
   end
   def retry?
-    #the following may be worthy of a sig on "The Daily WTF", but this guarantees a boolean gets returned.  @retry is not
-    #guaranteed to be a boolean.
+    #the following may be worthy of a sig on "The Daily WTF", but this guarantees a boolean gets returned.
+    #@retry is not guaranteed to be a boolean.
     if @retry
       return true
     else

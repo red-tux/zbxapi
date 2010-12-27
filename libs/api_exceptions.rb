@@ -93,6 +93,28 @@ end
 
 #------------------------------------------------------------------------------
 #
+# Class ZbxAPI_ExceptionLoginPermission
+#
+# Exception class for lack of API login permission
+#
+#------------------------------------------------------------------------------
+
+class ZbxAPI_ExceptionLoginPermission < ZError
+end
+
+#------------------------------------------------------------------------------
+#
+# Class ZbxAPI_ExceptionPermissionError
+#
+# Exception class for general API permissions errors
+#
+#------------------------------------------------------------------------------
+
+class ZbxAPI_ExceptionPermissionError < ZError
+end
+
+#------------------------------------------------------------------------------
+#
 # Class ZbxAPI_GeneralError
 #
 # Exception class for errors not encompassed in the above exceptions.

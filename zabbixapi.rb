@@ -264,7 +264,16 @@ class ZabbixAPI
       # check return code and throw exception for error checking
       resp = JSON.parse(response.body) #parse the JSON Object so we can use it
       if !resp["error"].nil?
-        raise ZbxAPI_GeneralError, resp["error"]
+        errcode=resp["error"]["code"].to_i
+        case errcode
+          when -32602 then
+            raise ZbxAPI_ExceptionLoginPermission.new(resp["error"],:retry=>true)
+          when -32500 then
+            raise ZbxAPI_ExceptionPermissionError.new(resp["error"],:retry=>true)
+          else
+            puts "other error"
+            raise ZbxAPI_GeneralError, resp["error"]
+        end
       end
 
 		  return resp

@@ -250,6 +250,12 @@ class ZabconCore
     rescue ZbxAPI_ExceptionVersion => e
       puts e
       retry  # We will allow for graceful recover from Version exceptions
+    rescue ZbxAPI_ExceptionLoginPermission
+      puts "No login permissions"
+      retry
+    rescue ZbxAPI_ExceptionPermissionError
+      puts "You do not have permission to perform that operation"
+      retry
     rescue ZbxAPI_GeneralError => e
       puts "An error was received from the Zabbix server"
       if e.message.class==Hash
