@@ -157,7 +157,7 @@ class ZabconCore
       @commands.insert "get host", "group", @server.method(:gethostgroup), no_args, no_help, @arg_processor.default_get
       @commands.insert "get host group", "id", @server.method(:gethostgroupid), no_args, no_help, @arg_processor.method(:get_group_id)
       @commands.insert "get", "item", @server.method(:getitem),
-          ['itemids','hostids','groupids', 'triggerids','applicationids','status','templated_items','editable','count','pattern','limit','order'],
+          ['itemids','hostids','groupids', 'triggerids','applicationids','status','templated_items','editable','count','pattern','limit','order', 'show'],
           @cmd_help.method(:get_item), @arg_processor.default_get
       @commands.insert "get", "seid", @server.method(:getseid), no_args, no_help, @arg_processor.default_get
       @commands.insert "get", "trigger", @server.method(:gettrigger), no_args, no_help, @arg_processor.default_get
