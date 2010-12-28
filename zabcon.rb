@@ -26,7 +26,7 @@
 
 
 #setup our search path or libraries
-path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"
+$: << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
 begin
   require 'rubygems'
@@ -40,10 +40,8 @@ end
 
 require 'optparse'
 require 'ostruct'
-require path+'libs/zdebug'
-require path+'libs/defines'
-#require path+"libs/check_dependencies"
-require path+'libs/zabcon_globals'
+require 'libs/zdebug'
+require 'libs/zabcon_globals'
 
 if RUBY_VERSION=="1.8.6"  #Ruby 1.8.6 lacks the each_char function in the string object, so we add it here
   String.class_eval do
@@ -225,10 +223,8 @@ class ZabconApp
       end
     end
 
-    path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"  #TODO: make this less clugey
-    require path+'libs/zabcon_core'   #Require placed after deps check
+    require 'libs/zabcon_core'   #Require placed after deps check
 
-#    p @options
     if @cmd_opts.help.nil?
       zabcon=ZabconCore.new
       zabcon.start()
@@ -236,9 +232,5 @@ class ZabconApp
   end
 end
 
-if __FILE__ == $0
-
 zabconapp=ZabconApp.new()
 zabconapp.run()
-
-end

@@ -22,17 +22,8 @@
 # $Revision$
 ##########################################
 
-#if __FILE__ == $0  #if we're executing the file we're in the same directory'
-#  dir=''
-#else
-#  dir='libs/'
-#end
-
-#setup our search path or libraries
-path=File.expand_path(File.dirname(__FILE__) + "/../libs")+"/"
-
-require path+'zdebug'
-require path+'zabcon_exceptions'
+require 'libs/zdebug'
+require 'libs/zabcon_exceptions'
 
 class Parser
 

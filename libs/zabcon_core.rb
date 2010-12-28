@@ -24,21 +24,18 @@
 # $Revision$
 ##########################################
 
-#setup our search path or libraries
-path=File.expand_path(File.dirname(__FILE__) + "/../libs")+"/"
-
 require 'parseconfig'
 require 'ostruct'
 require 'rexml/document'
-require path+'zbxcliserver'
-require path+'printer'
-require path+'zdebug'
-require path+'input'
-require path+'defines'
-require path+'command_tree'
-require path+'argument_processor'
-require path+'command_help'
-require path+'zabcon_globals'
+require 'libs/zbxcliserver'
+require 'libs/printer'
+require 'libs/zdebug'
+require 'libs/input'
+require 'libs/defines'
+require 'libs/command_tree'
+require 'libs/argument_processor'
+require 'libs/command_help'
+require 'libs/zabcon_globals'
 
 
 class ZabconCore

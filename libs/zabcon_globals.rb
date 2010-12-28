@@ -30,10 +30,7 @@
 #
 #------------------------------------------------------------------------------
 
-#setup our search path or libraries
-path=File.expand_path(File.dirname(__FILE__) + "/../libs")+"/"
-
-require path+'zdebug'
+require 'libs/zdebug'
 
 require 'singleton'
 require 'parseconfig'

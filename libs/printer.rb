@@ -23,11 +23,8 @@
 # $Revision$
 ##########################################
 
-#setup our search path or libraries
-path=File.expand_path(File.dirname(__FILE__) + "/../libs")+"/"
-
-require path+'zdebug'
-require path+'zabcon_globals'
+require 'libs/zdebug'
+require 'libs/zabcon_globals'
 
 if RUBY_PLATFORM =~ /.*?mswin.*?/
   require 'Win32API'

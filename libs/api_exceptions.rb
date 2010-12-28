@@ -29,11 +29,8 @@
 #
 #------------------------------------------------------------------------------
 
-#setup our search path or libraries
-path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"
-
-require path+'zdebug'
-require path+'exceptions'
+require 'libs/zdebug'
+require 'libs/exceptions'
 
 #------------------------------------------------------------------------------
 #

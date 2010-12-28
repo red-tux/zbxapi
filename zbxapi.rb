@@ -25,11 +25,10 @@
 #++
 
 #setup our search path or libraries
-path=File.expand_path(File.dirname(__FILE__) + "/./")+"/"
+$: << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
-
-require path+'libs/zdebug'
-require path+'libs/api_exceptions.rb'
+require 'libs/zdebug'
+require 'libs/api_exceptions.rb'
 require 'uri'
 #require 'net/http'
 require 'net/https'
