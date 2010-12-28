@@ -24,7 +24,7 @@
 
 path=File.expand_path(File.dirname(__FILE__) + "/../libs")+"/"
 
-require path + '../zabbixapi'
+require path + '../zbxapi'
 require path + 'zdebug'
 require path + 'zabcon_globals'
 

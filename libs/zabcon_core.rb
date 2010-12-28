@@ -66,7 +66,11 @@ class ZabconCore
 
     if !@env["server"].nil? and !@env["username"].nil? and !@env["password"].nil? then
       puts "Found valid login credentials, attempting login"  if @env["echo"]
-      do_login({:server=>@env["server"], :username=>@env["username"],:password=>@env["password"]})
+      begin
+        do_login({:server=>@env["server"], :username=>@env["username"],:password=>@env["password"]})
+      rescue ZbxAPI_ExceptionLoginPermission
+        puts "Error Invalid login or no API permissions."
+      end
     end
 
     debug(5,"Setting up prompt")
