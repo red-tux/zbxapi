@@ -83,7 +83,8 @@ class ZabconApp
         @cmd_opts.help=true
         puts opts
       end
-      opts.on("-l", "--load FILE", "load configuration file supplied or ","default if none") do |file|
+      opts.on("-l", "--load FILE", "load configuration file supplied or ","search the following default paths",
+              "./zabcon.conf, ~/zabcon.conf in that","order") do |file|
         @cmd_opts.config_file=file
       end
       opts.on("--no-config", "Do not attempt to automatically load","the configuration file") do
@@ -119,7 +120,7 @@ class ZabconApp
     env["logged_in"]=false
     env["have_tty"]=STDIN.tty?
     env["echo"]=STDIN.tty? ? true: false
-    env["config_file"]="zabcon.conf"
+    env["config_file"]=:default
     env["load_config"]=true
 
     #output related environment variables
@@ -142,13 +143,13 @@ class ZabconApp
     items=ruby_rev.length < required_rev.length ? ruby_rev.length : required_rev.length
 
     for i in 0..items-1 do
-      if ruby_rev[i]<required_rev[i]
+      if ruby_rev[i].to_i<required_rev[i].to_i
         puts
         puts "Zabcon requires Ruby version #{required_rev.join('.')} or higher."
         puts "you are using Ruby version #{RUBY_VERSION}."
         puts
         exit(1)
-      elsif ruby_rev[i]>required_rev[i]
+      elsif ruby_rev[i].to_i>required_rev[i].to_i
         break
       end
     end
@@ -184,7 +185,9 @@ class ZabconApp
       h.each_pair do |k,v|
         cmd_hash[k.to_s]=v
       end
+
       EnvVars.instance.load_config(cmd_hash)
+
     rescue OptionParser::InvalidOption  => e
       puts e
       puts
@@ -205,7 +208,6 @@ class ZabconApp
     puts RUBY_PLATFORM if EnvVars.instance["echo"]
 
     check_dependencies("1.8.6","parseconfig", "json", "highline")
-    #check_dependencies("0.0.0","parseconfig", "json", "highline")
 
     begin
       require 'readline'

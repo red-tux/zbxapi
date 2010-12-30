@@ -111,6 +111,9 @@ end
 
 class EnvVars < GlobalsBase
 
+  class NoConfig < Exception
+  end
+
   def initialize
     super()
   end
@@ -121,13 +124,31 @@ class EnvVars < GlobalsBase
   def load_config(overrides={})
     begin
       config_file = overrides["config_file"].nil? ? self["config_file"] : overrides["config_file"]
+
+      if config_file==:default
+        home_default=File::expand_path("~/zabcon.conf")
+        if File::exists?("zabcon.conf")
+          config_file="zabcon.conf"
+        elsif File::exists?(home_default)
+          config_file=home_default
+          self["config_file"]=home_default
+        else
+          raise NoConfig
+        end
+      end
+
       config = overrides["load_config"]==false ?   # nil != false
-      {} : ParseConfig.new(config_file).params
+          {} : ParseConfig.new(config_file).params
+
+
       # If we are not loading the config use an empty hash
     rescue Errno::EACCES
       if !(config_file=="zabcon.conf" and !File::exists?(config_file))
         puts "Unable to access configuration file: #{config_file}"
       end
+      config={}
+    rescue NoConfig
+      puts "Unable to find a default configuration file"
       config={}
     end
 
