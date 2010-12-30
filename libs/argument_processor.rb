@@ -291,7 +291,7 @@ class ArgumentProcessor
 
     debug(2,args,"Pre substitution")
     args=unescape(substitute(split(args)).join)
-    debug(2,args,"Post Substitution")
+    debug(2,args,"Post substitution")
 
     return args
   end
@@ -325,7 +325,7 @@ class ArgumentProcessor
   end
 
   # This is the default Parameter processor.  This is passed to the Command Tree object when it is instantiated
-  # The default processor also checks the incoming parameters against the a list of valid arguments, and merges
+  # The default processor also checks the incoming parameters against a list of valid arguments, and merges
   # the user variables with the inbound arguments with the inbound arguments taking precedence, raises an
   # exception if there is an error
   def default_processor(help_func,valid_args,args,user_vars,*options)
@@ -528,21 +528,21 @@ class ArgumentProcessor
     end
 
     #  Item types
-    #  0 Zabbix agent                  - Passive
-    #  1 SNMPv1 agent                - SNMP
-    #  2 Zabbix trapper                - Trapper
-    #  3 Simple check                   - Simple
-    #  4 SNMPv2 agent                - SNMP2
-    #  5 Zabbix internal               - Internal
-    #  6 SNMPv3 agent                - SNMP3
+    #  0 Zabbix agent             - Passive
+    #  1 SNMPv1 agent             - SNMP
+    #  2 Zabbix trapper           - Trapper
+    #  3 Simple check             - Simple
+    #  4 SNMPv2 agent             - SNMP2
+    #  5 Zabbix internal          - Internal
+    #  6 SNMPv3 agent             - SNMP3
     #  7 Zabbix agent (active)    - Active
-    #  8 Zabbix aggregate          - Aggregate
-    # 10 External check               - External
+    #  8 Zabbix aggregate         - Aggregate
+    # 10 External check           - External
     # 11 Database monitor         - Database
-    # 12 IPMI agent                     - IPMI
-    # 13 SSH agent                      - SSH
-    # 14 TELNET agent                - Telnet
-    # 15 Calculated                      - Calculated
+    # 12 IPMI agent               - IPMI
+    # 13 SSH agent                - SSH
+    # 14 TELNET agent             - Telnet
+    # 15 Calculated               - Calculated
 
     #value types
     # 0 Numeric (float)
@@ -759,10 +759,3 @@ if __FILE__ == $0
   p arg='hosts=[{hostid=10017}] name="zzz"'
   pp arg_processor.params_to_hash(arg)
 end
-
-
-
-
-
-
-
