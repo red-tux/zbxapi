@@ -249,13 +249,16 @@ class ZabbixAPI
         'User-Agent'=>'Zbx Ruby CLI'}
       debug(4,"Sending: #{json_obj}")
       response = http.post(@url.path, json_obj,headers)
-      if response.code=="301"
-        puts "Redirecting to #{response['location']}"
-        @url=URI.parse(response['location'])
-				raise Redirect
-      end
       debug(4,"Response Code: #{response.code}")
       debug(4,response.body,"Response Body",5000)
+      case response.code.to_i
+        when 301
+          puts "Redirecting to #{response['location']}"
+          @url=URI.parse(response['location'])
+				  raise Redirect
+        when 500
+          raise ZbxAPUI_GeneralError.new("Zabbix server returned an internal error\n Call: #{json_obj}", :retry=>true)
+      end
 #    end
 
       @id+=1  # increment the ID value for the API call
