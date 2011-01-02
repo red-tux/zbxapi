@@ -257,7 +257,7 @@ class ZabbixAPI
           @url=URI.parse(response['location'])
 				  raise Redirect
         when 500
-          raise ZbxAPUI_GeneralError.new("Zabbix server returned an internal error\n Call: #{json_obj}", :retry=>true)
+          raise ZbxAPI_GeneralError.new("Zabbix server returned an internal error\n Call: #{json_obj}", :retry=>true)
       end
 #    end
 
