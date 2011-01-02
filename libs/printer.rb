@@ -357,7 +357,7 @@ class OutputPrinter
       elsif dataset[:result].class==Hash then
         print_hash(dataset,cols_to_show)
       elsif dataset[:result].class!=NilClass then
-        puts "Unknown object received by the print routint"
+        puts "Unknown object received by the print routine"
         puts "Class type: #{dataset[:result].class}"
         puts "Data:"
         p dataset[:result]
