@@ -76,29 +76,26 @@ class CommandHelp
   end
 
   def help(command_tree,input)
+    input=input.gsub(/^\s*help\s*/,"")  #strip out the help statement at the start
     debug(6,command_tree.commands,"command_tree",350)
     debug(6,input,"input")
 
     items=input.split(" ")
-    if items.length==1
-      debug(6)
-
+    if items.length==0
       puts @doc.elements["//item[@command='help']"].text
     else # more than "help" was typed by the user
-      items.delete("help")
       help_cmd=items.join(" ").lstrip.chomp
 
-      if help_cmd=="commands"
+      if help_cmd.downcase=="commands"
         puts @doc.elements["//item[@command='help_commands']"].text
       else
         debug(4,help_cmd,"Searching for help on")
 
         cmd=command_tree.search(help_cmd)[0]  #search returns an array
-
-        if !cmd.helpproc.nil?
-          cmd.helpproc.call(nil)  #TODO: need to fix, see line 67 above
-        else
+        if cmd.nil? or cmd[:helpproc].nil?
           puts "Unable to find help for \"#{help_cmd}\""
+        else
+          cmd[:helpproc].call(nil)  #TODO: need to fix, see line 67 above
         end
       end
     end

@@ -32,7 +32,7 @@ class Parser
   attr_reader :commands
 
   def initialize(default_argument_processor)
-    @commands=CommandTree.new("",nil,0,nil,nil,nil,nil)
+    @commands=NewCommandTree.new
     @default_argument_processor=default_argument_processor
   end
 
@@ -53,13 +53,11 @@ class Parser
 
     str=strip_comments(str)
 
-    nodes = [""]+str.split
 
-    cmd_node=@commands.search(nodes)  # a side effect of the function is that it also manipulates nodes
+#    cmd_node=@commands.search(nodes)  # a side effect of the function is that it also manipulates nodes
+     cmd_node=@commands.get_command(str)
     debug(7,cmd_node,"search result")
-    args=nodes.join(" ")
-
-    return cmd_node,args
+    return cmd_node[:command],cmd_node[:parameters]
 
   end
 
@@ -80,17 +78,20 @@ class Parser
     debug(7,str,"Parsing")
 #    options=
     debug(7,user_vars,"User Variables")
-    cmd_node,args=search(str)
 
-    if cmd_node.commandproc.nil? then
+    result=@commands.get_command(str)
+
+    cmd=result[:command]
+
+    if cmd.nil? or cmd[:commandproc].nil? then
       raise ParseError.new("Parse error, incomplete/unknown command: #{str}",:retry=>true)
     else
       # The call here to the argument process requires one argument as it's a lambda block which is setup when the
       # command node is created
-      debug(6,args,"calling argument processor")
-      args=cmd_node.argument_processor.call(args,user_vars)
+      debug(6,result[:parameters],"calling argument processor")
+      args=cmd[:argument_processor].call(result[:parameters],user_vars)
       debug(6,args,"received from argument processor")
-      retval = args.nil? ? nil : {:proc=>cmd_node.commandproc, :helpproc=>cmd_node.helpproc, :options=>cmd_node.options}.merge(args)
+      retval = args.nil? ? nil : {:proc=>cmd[:commandproc], :helpproc=>cmd[:helpproc], :options=>cmd[:options]}.merge(args)
       return retval
     end
   end
@@ -119,19 +120,142 @@ class Parser
     end
   end
 
-  def insert(insert_path,command,commandproc,arguments=[],helpproc=nil,argument_processor=nil,*options)
-    debug(10,{"insert_path"=>insert_path, "command"=>command, "commandproc"=>commandproc, "arguments"=> arguments, "helpproc"=>helpproc, "argument_processor"=>argument_processor, "options"=>options})
-   insert_path_arr=[""]+insert_path.split   # we must pre-load our array with a blank node at the front
+  def insert(insert_path,commandproc,arguments=[],helpproc=nil,argument_processor=nil,*options)
+    debug(10,{"insert_path"=>insert_path, "commandproc"=>commandproc, "arguments"=> arguments, "helpproc"=>helpproc, "argument_processor"=>argument_processor, "options"=>options})
+#   insert_path_arr=[""]+insert_path.split   # we must pre-load our array with a blank node at the front
 #    p insert_path_arr
 
     # If the parameter "argument_processor" is nil use the default argument processor
     arg_processor = argument_processor.nil? ? @default_argument_processor : argument_processor
-    @commands.insert(insert_path_arr,command,commandproc,arguments,helpproc,arg_processor,options)
+    @commands.insert(insert_path,commandproc,arguments,helpproc,arg_processor,options)
   end
 
 end
 
+#{"add"=>{:node=>proc, "host"=>{:node=>proc,"group"=>{:node=>proc}}},"delete"=>...}
 
+class NewCommandTree
+  include ZDebug
+
+  def initialize
+    @tree = {}
+  end
+
+  def insert(insert_path,commandproc,arguments,helpproc,argument_processor,options)
+    tree_node=@tree
+    path_length=insert_path.length-1
+    insert_path.each_index do |index|
+      if tree_node[insert_path[index]].nil?
+        if index<path_length
+          tree_node[insert_path[index]]={}
+          tree_node=tree_node[insert_path[index]]
+        else
+          local_arg_processor=lambda do |params,user_vars|
+  	        if argument_processor.nil?
+	            nil
+	          else
+	            argument_processor.call(helpproc,arguments,params,user_vars,options)  # We pass the list of valid arguments to
+	         end
+          end
+          if options.nil?
+  	        local_options=nil
+	        else
+	          local_options = Hash[*options.collect { |v|
+	            [v, true]
+	          }.flatten]
+	        end
+          tree_node[insert_path[index]]={:node=>
+            {:commandproc=>commandproc, :arguments=>arguments, :helpproc=>helpproc,
+             :argument_processor=>local_arg_processor,:options=>local_options}}
+        end
+      else
+        tree_node=tree_node[insert_path[index]]
+      end
+    end
+  end
+
+  #get_command(String)
+  #returns a Hash with two items: :command and :parameters
+  #:command is a hash denoting all of the components of a the command when it was inserted
+  #:parameters is the remainder of the String passed in.
+  #
+  #example:
+  #  get_command("get host show=all")
+  #  {:command=>{hash created from insert}, :parameters=>"show=all"}
+  #
+  #  get_command("get host test           test2")
+  #  {:command=>{hash created from insert}, :parameters=>"test           test2"
+    def get_command(str)
+    str_array=str.downcase.split  #ensure all comparisons are done in lower case
+    str_items=str_array.length
+
+    cur_node=@tree
+    count=0
+
+    str_array.collect do |item|
+      break if cur_node[item].nil?
+      count+=1
+
+      cur_node=cur_node[item]
+    end
+
+    cmd= cur_node.nil? ? nil : cur_node[:node]
+
+    #remove preceding items found so we can return the remainder
+    #as the parameters
+    count.times do |i|
+      str=str.gsub(/^#{str_array[i]}/,"")
+      str=str.gsub(/^\s*/,"")
+    end
+
+    {:command=>cmd,:parameters=>str}
+  end
+
+end
+  def search(search_path)
+      debug(10,search_path,"search_path")
+    return retval if results.empty?  # no more children to search, return retval which may be self or nil, see logic above
+        debug(10)
+
+        return results[0].search(search_path)
+        debug(10,"Not digging deeper")
+
+        return self if search_path[0]==@command
+
+      end
+
+  def insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options)
+      do_insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options,0)
+      end
+
+  # Insert path is the path to insert the item into the tree
+  # Insert path is passed in as an array of names which associate with pre-existing nodes
+  # The function will recursively insert the command and will remove the top of the input path stack at each level until it
+  # finds the appropraite level.  If the appropriate level is never found an exception is raised.
+  def do_insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options,depth)
+      debug(11,{"insert_path"=>insert_path, "command"=>command, "commandproc"=>commandproc, "arguments"=> arguments,
+                  "helpproc"=>helpproc, "verify_func"=>argument_processor, "depth"=>depth})
+        debug(11,@command,"self.command")
+#    debug(11,@children.map {|child| child.command},"children")
+
+      if insert_path[0]==@command then
+          debug(11,"Found node")
+            if insert_path.length==1 then
+                debug(11,command,"inserting")
+                  @children << CommandTree.new(command,commandproc,depth+1,arguments,helpproc,argument_processor,options)
+                else
+                    debug(11,"Not found walking tree")
+                      insert_path.shift
+                      if !@children.empty? then
+                          @children.each { |node| node.do_insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options,depth+1)}
+                          else
+                              raise(Command_Tree_Exception,"Unable to find insert point in Command Tree")
+                              end
+                    end
+          end
+  end
+
+=begin
 class CommandTree
 
   include ZDebug
@@ -191,72 +315,31 @@ class CommandTree
   # or the immediate children nodes.  It does not search the tree beyond one level.
   # The loggedin argument is used to differentiate searching for commands which require a valid
   # login or not.  If loggedin is false it will return commands which do not require a valid login.
-  def search(search_path)
-    debug(10,search_path,"search_path")
-    debug(10,self,"self",300)
+  debug(10,self,"self",300)
 
-    return nil if search_path.nil?
-    return nil if search_path.empty?
+  return nil if search_path.nil?
+  return nil if search_path.empty?
 
-    retval=nil
+  retval=nil
 
-    retval=self if search_path[0]==@command
+  retval=self if search_path[0]==@command
 
 
-    search_path.shift
-    debug(10,search_path, "shifted search path")
+  search_path.shift
+  debug(10,search_path, "shifted search path")
 
-    return retval if search_path.length==0
+  return retval if search_path.length==0
 
 #    p search_path
 #    p @children.map {|child| child.command}
-    debug(10,@children.map{|child| child.command},"Current children")
+  debug(10,@children.map{|child| child.command},"Current children")
 
-    results=@children.map {|child| child.command==search_path[0] ? child : nil }
-    results.compact!
-    debug(10,results,"Children search results",200)
-    return retval if results.empty?  # no more children to search, return retval which may be self or nil, see logic above
-    debug(10)
-
-    return results[0].search(search_path)
-    debug(10,"Not digging deeper")
-
-    return self if search_path[0]==@command
-
-  end
-
-  def insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options)
-    do_insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options,0)
-  end
-
-  # Insert path is the path to insert the item into the tree
-  # Insert path is passed in as an array of names which associate with pre-existing nodes
-  # The function will recursively insert the command and will remove the top of the input path stack at each level until it
-  # finds the appropraite level.  If the appropriate level is never found an exception is raised.
-  def do_insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options,depth)
-    debug(11,{"insert_path"=>insert_path, "command"=>command, "commandproc"=>commandproc, "arguments"=> arguments,
-              "helpproc"=>helpproc, "verify_func"=>argument_processor, "depth"=>depth})
-    debug(11,@command,"self.command")
-#    debug(11,@children.map {|child| child.command},"children")
-
-    if insert_path[0]==@command then
-      debug(11,"Found node")
-      if insert_path.length==1 then
-        debug(11,command,"inserting")
-        @children << CommandTree.new(command,commandproc,depth+1,arguments,helpproc,argument_processor,options)
-      else
-        debug(11,"Not found walking tree")
-        insert_path.shift
-        if !@children.empty? then
-          @children.each { |node| node.do_insert(insert_path,command,commandproc,arguments,helpproc,argument_processor,options,depth+1)}
-        else
-          raise(Command_Tree_Exception,"Unable to find insert point in Command Tree")
-        end
-      end
-    end
-  end
+  results=@children.map {|child| child.command==search_path[0] ? child : nil }
+  results.compact!
+  debug(10,results,"Children search results",200)
 
 end
+=end
 
 
 if __FILE__ == $0

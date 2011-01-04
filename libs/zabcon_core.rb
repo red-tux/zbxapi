@@ -109,104 +109,92 @@ class ZabconCore
     # parameters for insert:  insert_path, command, commandproc, arguments=[], helpproc=nil, verify_func=nil, options
 
     # These commands do not require a valid login
-    @commands.insert "", "quit", :exit
-    @commands.insert "", "exit", :exit
-    @commands.insert "", "help", :help,no_args,no_help,@arg_processor.help, :suppress_printer
+    @commands.insert ["quit"], :exit
+    @commands.insert ["exit"], :exit
+    @commands.insert ["help"], :help,no_args,no_help,@arg_processor.help, :suppress_printer
 
-    @commands.insert "", "hisotry", self.method(:do_history),no_args,no_help,no_verify,:suppress_printer
-    @commands.insert "", "info", self.method(:do_info),no_args,no_help,no_verify,:suppress_printer
-    @commands.insert "", "load", no_cmd,no_args,no_help,no_verify,:suppress_printer
-    @commands.insert "", "login", self.method(:do_login),nil,nil,@arg_processor.method(:login), :suppress_printer
-    @commands.insert "", "set", no_cmd
-    @commands.insert "", "show", no_cmd
-    @commands.insert "", "unset", no_cmd
-    @commands.insert "load", "config", @env.method(:load_config),no_args,no_help,no_verify,:suppress_printer
-    @commands.insert "set", "debug", self.method(:set_debug),no_args,no_help,no_verify,:suppress_printer
-    @commands.insert "set", "lines", self.method(:set_lines),no_args,no_help,no_verify,:suppress_printer
-    @commands.insert "set", "pause", self.method(:set_pause),no_args,no_help,no_verify,:suppress_printer
-    @commands.insert "set", "var", self.method(:set_var), no_args, no_help, @arg_processor.method(:simple_processor),:suppress_printer
-    @commands.insert "set", "env", self.method(:set_env), no_args, no_help, @arg_processor.method(:simple_processor), :suppress_printer
-    @commands.insert "show", "var", self.method(:show_var), no_args, no_help, @arg_processor.method(:array_processor), :suppress_printer
-    @commands.insert "show", "env", self.method(:show_env), no_args, no_help, @arg_processor.method(:array_processor), :suppress_printer
-    @commands.insert "unset", "var", self.method(:unset_var), no_args, no_help, @arg_processor.method(:array_processor), :suppress_printer
+    @commands.insert ["hisotry"], self.method(:do_history),no_args,no_help,no_verify,:suppress_printer
+    @commands.insert ["info"], self.method(:do_info),no_args,no_help,no_verify,:suppress_printer
+    @commands.insert ["load"], no_cmd,no_args,no_help,no_verify,:suppress_printer
+    @commands.insert ["login"], self.method(:do_login),nil,nil,@arg_processor.method(:login), :suppress_printer
+    @commands.insert ["load","config"], @env.method(:load_config),no_args,no_help,no_verify,:suppress_printer
+    @commands.insert ["set","debug"], self.method(:set_debug),no_args,no_help,no_verify,:suppress_printer
+    @commands.insert ["set","lines"], self.method(:set_lines),no_args,no_help,no_verify,:suppress_printer
+    @commands.insert ["set","pause"], self.method(:set_pause),no_args,no_help,no_verify,:suppress_printer
+    @commands.insert ["set","var"], self.method(:set_var), no_args, no_help, @arg_processor.method(:simple_processor),:suppress_printer
+    @commands.insert ["set","env"], self.method(:set_env), no_args, no_help, @arg_processor.method(:simple_processor), :suppress_printer
+    @commands.insert ["show","var"], self.method(:show_var), no_args, no_help, @arg_processor.method(:array_processor), :suppress_printer
+    @commands.insert ["show","env"], self.method(:show_env), no_args, no_help, @arg_processor.method(:array_processor), :suppress_printer
+    @commands.insert ["unset","var"], self.method(:unset_var), no_args, no_help, @arg_processor.method(:array_processor), :suppress_printer
+
 
     if loggedin then
       debug(5,"Inserting commands which require login")
       # This command tree is for a valid login
-      @commands.insert "", "raw", no_cmd
-      @commands.insert "", "add", no_cmd
-      @commands.insert "", "delete", no_cmd
-      @commands.insert "", "get", no_cmd, no_args, @cmd_help.method(:get)
-      @commands.insert "", "import", self.method(:do_import),no_args,no_help,no_verify
-      @commands.insert "", "update", no_cmd
+      @commands.insert ["get"], no_cmd, no_args, @cmd_help.method(:get)
+      @commands.insert ["import"], self.method(:do_import),no_args,no_help,no_verify
 
-      @commands.insert "add", "app", @server.method(:addapp),no_args,no_help,no_verify
-      @commands.insert "add app", "id", @server.method(:getappid),no_args,no_help,no_verify
-      @commands.insert "add", "host", @server.method(:addhost), no_args, @cmd_help.method(:add_host), @arg_processor.method(:add_host), :server => @server
-      @commands.insert "add host", "group", @server.method(:addhostgroup),no_args,no_help,no_verify
-      @commands.insert "add", "item", @server.method(:additem), no_args, @cmd_help.method(:add_item), @arg_processor.method(:add_item)
-      @commands.insert "add", "link", @server.method(:addlink),no_args,no_help,no_verify
-      @commands.insert "add link", "trigger", @server.method(:addlinktrigger),no_args,no_help,no_verify
-      @commands.insert "add", "sysmap", @server.method(:addsysmap),no_args,no_help,no_verify
-      @commands.insert "add sysmap", "element", @server.method(:addelementtosysmap),no_args,no_help,no_verify
-      @commands.insert "add", "trigger", @server.method(:addtrigger),no_args,no_help,no_verify
-      @commands.insert "add", "user", @server.method(:adduser), no_args, @cmd_help.method(:add_user), @arg_processor.method(:add_user)
-      @commands.insert "add user", "media", @server.method(:addusermedia),no_args,@cmd_help.method(:add_user_media),no_verify
+      @commands.insert ["add","app"], @server.method(:addapp),no_args,no_help,no_verify
+      @commands.insert ["add","app","id"], @server.method(:getappid),no_args,no_help,no_verify
+      @commands.insert ["add","host"], @server.method(:addhost), no_args, @cmd_help.method(:add_host), @arg_processor.method(:add_host), :server => @server
+      @commands.insert ["add","host","group"], @server.method(:addhostgroup),no_args,no_help,no_verify
+      @commands.insert ["add","item"], @server.method(:additem), no_args, @cmd_help.method(:add_item), @arg_processor.method(:add_item)
+      @commands.insert ["add","link"], @server.method(:addlink),no_args,no_help,no_verify
+      @commands.insert ["add","link","trigger"], @server.method(:addlinktrigger),no_args,no_help,no_verify
+      @commands.insert ["add","sysmap"], @server.method(:addsysmap),no_args,no_help,no_verify
+      @commands.insert ["add","sysmap","element"], @server.method(:addelementtosysmap),no_args,no_help,no_verify
+      @commands.insert ["add","trigger"], @server.method(:addtrigger),no_args,no_help,no_verify
+      @commands.insert ["add","user"], @server.method(:adduser), no_args, @cmd_help.method(:add_user), @arg_processor.method(:add_user)
+      @commands.insert ["add","user","media"], @server.method(:addusermedia),no_args,@cmd_help.method(:add_user_media),no_verify
 
-      @commands.insert "get", "app", @server.method(:getapp), no_args, no_help, @arg_processor.default_get
-      @commands.insert "get", "host", @server.method(:gethost), no_args, no_help, @arg_processor.default_get
-      @commands.insert "get host", "group", @server.method(:gethostgroup), no_args, no_help, @arg_processor.default_get
-      @commands.insert "get host group", "id", @server.method(:gethostgroupid), no_args, no_help, @arg_processor.method(:get_group_id)
-      @commands.insert "get", "item", @server.method(:getitem),
+      @commands.insert ["get","app"], @server.method(:getapp), no_args, no_help, @arg_processor.default_get
+      @commands.insert ["get","host"], @server.method(:gethost), no_args, no_help, @arg_processor.default_get
+      @commands.insert ["get","host","group"], @server.method(:gethostgroup), no_args, no_help, @arg_processor.default_get
+      @commands.insert ["get","host","group","id"], @server.method(:gethostgroupid), no_args, no_help, @arg_processor.method(:get_group_id)
+      @commands.insert ["get","item"], @server.method(:getitem),
           ['itemids','hostids','groupids', 'triggerids','applicationids','status','templated_items','editable','count','pattern','limit','order', 'show'],
           @cmd_help.method(:get_item), @arg_processor.default_get
-      @commands.insert "get", "seid", @server.method(:getseid), no_args, no_help, @arg_processor.default_get
-      @commands.insert "get", "trigger", @server.method(:gettrigger), no_args, no_help, @arg_processor.default_get
-      @commands.insert "get", "user", @server.method(:getuser),['show'], @cmd_help.method(:get_user), @arg_processor.method(:get_user)
+      @commands.insert ["get","seid"], @server.method(:getseid), no_args, no_help, @arg_processor.default_get
+      @commands.insert ["get","trigger"], @server.method(:gettrigger), no_args, no_help, @arg_processor.default_get
+      @commands.insert ["get","user"], @server.method(:getuser),['show'], @cmd_help.method(:get_user), @arg_processor.method(:get_user)
 
-      @commands.insert "delete", "user", @server.method(:deleteuser), ['id'], @cmd_help.method(:delete_user), @arg_processor.method(:delete_user)
-      @commands.insert "delete", "host", @server.method(:deletehost), no_args, @cmd_help.method(:delete_host), @arg_processor.method(:delete_host)
-      @commands.insert "delete", "item", @server.method(:deleteitem), ['itemid'], @cmd_help.method(:delete_item), @arg_processor.default
+      @commands.insert ["delete","user"], @server.method(:deleteuser), ['id'], @cmd_help.method(:delete_user), @arg_processor.method(:delete_user)
+      @commands.insert ["delete","host"], @server.method(:deletehost), no_args, @cmd_help.method(:delete_host), @arg_processor.method(:delete_host)
+      @commands.insert ["delete","item"], @server.method(:deleteitem), ['itemid'], @cmd_help.method(:delete_item), @arg_processor.default
 
-      @commands.insert "raw", "api", @server.method(:raw_api), no_args, @cmd_help.method(:raw_api), @arg_processor.method(:raw_api)
-      @commands.insert "raw", "json", @server.method(:raw_json), no_args, @cmd_help.method(:raw_json), @arg_processor.method(:raw_processor)
+      @commands.insert ["raw","api"], @server.method(:raw_api), no_args, @cmd_help.method(:raw_api), @arg_processor.method(:raw_api)
+      @commands.insert ["raw","json"], @server.method(:raw_json), no_args, @cmd_help.method(:raw_json), @arg_processor.method(:raw_processor)
 
-      @commands.insert "update", "user", @server.method(:updateuser), no_args, no_help, no_verify
+      @commands.insert ["update","user"], @server.method(:updateuser), no_args, no_help, no_verify
     else
       debug(5,"Inserting commands which do not require login")
       # This command tree is for no login
-      @commands.insert "", "add", no_cmd
-      @commands.insert "", "delete", no_cmd
-      @commands.insert "", "get", no_cmd
-      @commands.insert "", "import", no_cmd,no_args,no_help
-      @commands.insert "", "update", no_cmd
+      @commands.insert ["add","app"], login_required,no_args,no_help
+      @commands.insert ["add","app","id"], login_required,no_args,no_help
+      @commands.insert ["add","host"], login_required, no_args, @cmd_help.method(:add_host)
+      @commands.insert ["add","host","group"], login_required,no_args,no_help
+      @commands.insert ["add","item"], login_required, no_args, no_help
+      @commands.insert ["add","link"], login_required,no_args,no_help
+      @commands.insert ["add","link","trigger"], login_required,no_args,no_help
+      @commands.insert ["add","sysmap"], login_required,no_args,no_help
+      @commands.insert ["add","sysmap","element"], login_required,no_args,no_help
+      @commands.insert ["add","trigger"], login_required,no_args,no_help
+      @commands.insert ["add","user"], login_required, no_args, @cmd_help.method(:add_user)
+      @commands.insert ["add","user","media"], login_required,no_args,no_help
 
-      @commands.insert "add", "app", login_required,no_args,no_help
-      @commands.insert "add app", "id", login_required,no_args,no_help
-      @commands.insert "add", "host", login_required, no_args, @cmd_help.method(:add_host)
-      @commands.insert "add host", "group", login_required,no_args,no_help
-      @commands.insert "add", "item", login_required, no_args, no_help
-      @commands.insert "add", "link", login_required,no_args,no_help
-      @commands.insert "add link", "trigger", login_required,no_args,no_help
-      @commands.insert "add", "sysmap", login_required,no_args,no_help
-      @commands.insert "add sysmap", "element", login_required,no_args,no_help
-      @commands.insert "add", "trigger", login_required,no_args,no_help
-      @commands.insert "add", "user", login_required, no_args, @cmd_help.method(:add_user)
-      @commands.insert "add user", "media", login_required,no_args,no_help
+      @commands.insert ["get","app"], login_required, no_args, no_help
+      @commands.insert ["get","host"], login_required, no_args, no_help
+      @commands.insert ["get","host","group"], login_required, no_args, no_help
+      @commands.insert ["get","host","group","id"], login_required, no_args, no_help
+      @commands.insert ["get","item"], login_required, no_args, no_help
+      @commands.insert ["get","seid"], login_required, no_args, no_help
+      @commands.insert ["get","trigger"], login_required, no_args, no_help
+      @commands.insert ["get","user"], login_required,no_args, @cmd_help.method(:get_user)
 
-      @commands.insert "get", "app", login_required, no_args, no_help
-      @commands.insert "get", "host", login_required, no_args, no_help
-      @commands.insert "get host", "group", login_required, no_args, no_help
-      @commands.insert "get host group", "id", login_required, no_args, no_help
-      @commands.insert "get", "item", login_required, no_args, no_help
-      @commands.insert "get", "seid", login_required, no_args, no_help
-      @commands.insert "get", "trigger", login_required, no_args, no_help
-      @commands.insert "get", "user", login_required,no_args, @cmd_help.method(:get_user)
+      @commands.insert ["delete","user"], login_required, no_args, @cmd_help.method(:delete_user)
+      @commands.insert ["delete","host"], login_required, no_args, @cmd_help.method(:delete_host)
 
-      @commands.insert "delete", "user", login_required, no_args, @cmd_help.method(:delete_user)
-      @commands.insert "delete", "host", login_required, no_args, @cmd_help.method(:delete_host)
-
-      @commands.insert "update", "user", login_required, no_args, no_help
+      @commands.insert ["update","user"], login_required, no_args, no_help
     end
   end
 
