@@ -27,7 +27,7 @@
 spec = Gem::Specification.new do |s|
   s.name = %q{zabcon}
   s.rubyforge_project = "zabcon"
-  s.version = "0.0.3"
+  s.version = "0.0.4"
   s.authors = ["A. Nelson"]
   s.email = %q{nelsonab@red-tux.net}
   s.summary = %q{Zabcon command line interface for Zabbix}
