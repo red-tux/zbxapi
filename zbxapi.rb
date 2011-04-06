@@ -235,7 +235,9 @@ class ZabbixAPI
   end
 
   #Sends JSON encoded string to server
-  def do_request(json_obj)
+  #truncate_length determines how many characters at maximum should be displayed while debugging before
+  #truncation should occur.
+  def do_request(json_obj,truncate_length=5000)
     #puts json_obj
     redirects=0
     begin  # This is here for redirects
@@ -250,7 +252,7 @@ class ZabbixAPI
       debug(4,"Sending: #{json_obj}")
       response = http.post(@url.path, json_obj,headers)
       debug(4,"Response Code: #{response.code}")
-      debug(4,response.body,"Response Body",5000)
+      debug(4,response.body,"Response Body",truncate_length)
       case response.code.to_i
         when 301
           puts "Redirecting to #{response['location']}"

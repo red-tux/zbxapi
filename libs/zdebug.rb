@@ -76,7 +76,7 @@ module ZDebug
         strval="nil"
       elsif variable.class==String
         strval=variable
-        if !truncate.nil?
+        if !truncate.nil? && truncate>0
           if truncate<strval.length then
             o_strval=strval
             strval=o_strval[0..(truncate/2)]
