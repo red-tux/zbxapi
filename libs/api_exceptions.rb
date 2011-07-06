@@ -97,6 +97,10 @@ end
 #------------------------------------------------------------------------------
 
 class ZbxAPI_ExceptionLoginPermission < ZError
+  def initialize(message=nil, params=nil)
+    super(message, params)
+    @local_msg="This is also a general Zabbix API error number (Your error may not be a login error).\nTell the Zabbix devs to honor section 5.1 of the JSON-RPC 2.0 Spec."
+  end
 end
 
 #------------------------------------------------------------------------------

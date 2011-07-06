@@ -17,8 +17,8 @@
 
 ##########################################
 # Subversion information
-# $Id$
-# $Revision$
+# $Id: exceptions.rb 258 2010-12-28 22:49:21Z nelsonab $
+# $Revision: 258 $
 ##########################################
 
 require 'libs/zdebug'
@@ -116,4 +116,8 @@ class ParseError < ZError
     super(message, params)
     @local_msg="Parse Error"
   end
+end
+
+class ReturnError < ZError
+
 end

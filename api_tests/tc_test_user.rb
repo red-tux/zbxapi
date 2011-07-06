@@ -24,7 +24,7 @@
 $: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 require "test/unit"
-require "zabbixapi"
+require "zbxapi"
 
 class TC_Test_API_User < Test::Unit::TestCase
 
