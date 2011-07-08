@@ -25,7 +25,7 @@
 #Zabbix API Ruby Interface GemSpec file
 
 revision="$Revision$"
-p result=/[^\d]*(\d*)[^\d]*/.match(revision)
+result=/[^\d]*(\d*)[^\d]*/.match(revision)
 revision=result[1].to_i
 
 spec = Gem::Specification.new do |s|
