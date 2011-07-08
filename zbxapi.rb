@@ -26,6 +26,9 @@
 
 #TODO Create class to capture resultant data
 
+class ZabbixAPI  #create a stub to be defined later
+end
+
 #setup our search path or libraries
 $: << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
@@ -279,7 +282,6 @@ class ZabbixAPI
 
       # check return code and throw exception for error checking
       resp = JSON.parse(response.body) #parse the JSON Object so we can use it
-      raise
       if !resp["error"].nil?
         errcode=resp["error"]["code"].to_i
         case errcode

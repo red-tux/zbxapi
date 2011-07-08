@@ -24,6 +24,8 @@
 ##########################################
 #++
 
+require 'zbxapi'
+
 # Class: Zbx_API_Sub
 # Wrapper class to ensure all class calls goes to the parent object not the
 # currently instantiated object.

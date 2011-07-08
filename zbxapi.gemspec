@@ -43,5 +43,10 @@ spec = Gem::Specification.new do |s|
   s.require_paths =["."]
   s.files =
     ["zbxapi.rb", "libs/zdebug.rb", "libs/api_exceptions.rb",
-     "libs/exceptions.rb"]
+     "libs/exceptions.rb", "api_classes/application.rb",
+      "api_classes/history.rb", "api_classes/host.rb",
+      "api_classes/host_group.rb","api_classes/item.rb",
+      "api_classes/sysmap.rb", "api_classes/trigger.rb",
+      "api_classes/user.rb", "api_classes/user_group.rb",
+      "api_classes/subclass_base.rb"]
 end
