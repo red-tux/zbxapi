@@ -34,14 +34,12 @@ class ZError < RuntimeError
 
   include ZDebug
 
-  attr_reader :help_func, :message, :retry
+  attr_accessor :help_func, :message, :retry
 
   # list of valid params
   # :help_func, the help function with more information for the exception
   # : retry, is the exception eligable for retry?
   def initialize(message=nil, params=nil)
-    debug(2,self.class,"Exception raised")
-    debug(2,params,"params")
     raise "Exception not called correctly" if params.class!=Hash if !params.nil?
     params={} if params.nil?
     @help_func=params[:help_func]

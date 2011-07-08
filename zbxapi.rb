@@ -24,6 +24,8 @@
 ##########################################
 #++
 
+#TODO Create class to capture resultant data
+
 #setup our search path or libraries
 $: << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
