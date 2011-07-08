@@ -50,3 +50,4 @@ spec = Gem::Specification.new do |s|
       "api_classes/user.rb", "api_classes/user_group.rb",
       "api_classes/subclass_base.rb"]
 end
+

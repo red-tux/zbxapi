@@ -144,8 +144,6 @@ class ZabbixAPI
   #  1. The url used to create the class was bad
   #  1. The connection to the server was refused
   def login(user='',password='',save=true)
-#    p user.class
-#    p password.class
     if user.class!=String or password.class!=String
       raise ZbxAPI_ExceptionBadAuth.new,'Login called with non-string values'
     end
@@ -159,33 +157,40 @@ class ZabbixAPI
     elsif (@user_name!='' and @password!='') then
       l_user = @user_name
       l_password = @password
-    else
-
     end
 
+    #Somewhere in the 1.8.x cycle it was decided to do deprecate with user.authenticate
+    #however it was not documented well, so we will try uer.login first, and fall
+    #back to user.authenticate as user.login does not exist in 1.8.3
+    login_methods=["user.login","user.authenticate"]
+
     begin
-      result = do_request(json_obj('user.authenticate',{'user'=>l_user,'password'=>l_password}))
+      result = do_request(json_obj(login_methods.first,{'user'=>l_user,'password'=>l_password}))
       @auth=result['result']
 
       #setup the version variables
       @major,@minor=do_request(json_obj('APIInfo.version',{}))['result'].split('.')
       @major=@major.to_i
       @minor=@minor.to_i
-
+    rescue ZbxAPI_ExceptionLoginPermission => e
+      login_methods.delete_at(0)
+      if !login_methods.empty?
+        retry
+      else
+        raise e
+      end
     rescue SocketError
       raise ZbxAPI_ExceptionBadServerUrl
     rescue JSON::ParserError
       raise ZbxAPI_ExceptionBadServerUrl
     rescue Errno::ECONNREFUSED
       raise ZbxAPI_ExceptionBadServerUrl
-    rescue ZbxAPI_GeneralError => e
-      if e.message["code"]==-32602
-        raise ZbxAPI_ExceptionBadAuth,'Bad username and/or password'
-      else
-        raise e
-      end
     end
 
+  end
+
+  def logout
+    do_request(json_obj('user.logout'))
   end
 
   # Tests to determine if the login information is still valid
