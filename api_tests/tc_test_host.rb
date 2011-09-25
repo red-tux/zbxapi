@@ -1,3 +1,7 @@
+#import variables which describe our local test environment
+require "ts_local_vars"
+
+
 require "test/unit"
 
 class TC_Test_API_Host < Test::Unit::TestCase

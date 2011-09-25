@@ -177,7 +177,7 @@ class ZabbixAPI
       if !login_methods.empty?
         retry
       else
-        raise e
+        raise ZbxAPI_ExceptionBadAuth.new('Invalid User or Password',:error_code=>e.error_code)
       end
     rescue SocketError
       raise ZbxAPI_ExceptionBadServerUrl
@@ -291,9 +291,9 @@ class ZabbixAPI
         errcode=resp["error"]["code"].to_i
         case errcode
           when -32602 then
-            raise ZbxAPI_ExceptionLoginPermission.new(resp["error"],:retry=>true)
+            raise ZbxAPI_ExceptionLoginPermission.new(resp["error"],:error_code=>errcode,:retry=>true)
           when -32500 then
-            raise ZbxAPI_ExceptionPermissionError.new(resp["error"],:retry=>true)
+            raise ZbxAPI_ExceptionPermissionError.new(resp["error"],:error_code=>errcode,:retry=>true)
           else
             puts "other error"
             raise ZbxAPI_GeneralError, resp["error"]

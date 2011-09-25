@@ -36,7 +36,7 @@ require "api_tests/tc_test_host"
 class TS_All_Tests
    def self.suite
      suite = Test::Unit::TestSuite.new
-     suite << TC_Test_API_User
+     suite << TC_Test_API_00_User
      suite << TC_Test_API_Host
      return suite
    end

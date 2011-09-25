@@ -23,19 +23,22 @@
 
 $: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
+#import variables which describe our local test environment
+require "ts_local_vars"
+
 require "test/unit"
 require "zbxapi"
 
-class TC_Test_API_User < Test::Unit::TestCase
+class TC_Test_API_00_User < Test::Unit::TestCase
 
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
 
-    @server=$server.nil? ? "http://localhost/1.8.4rc3" : $server
-    @api_user=$api_user.nil? ? "apitest" : $api_user
-    @api_pass=$api_pass.nil? ? "apitest" : $api_pass
+    @server=$server
+    @api_user=$api_user
+    @api_pass=$api_pass
 
     @zbx_api = ZabbixAPI.new(@server)
     @zbx_api.login(@api_user,@api_pass)
@@ -48,7 +51,7 @@ class TC_Test_API_User < Test::Unit::TestCase
 
   end
 
-  def test_0_bad_logins
+  def test_00_bad_logins
     @zbx_api=ZabbixAPI.new("bad")
     assert_raise(ZbxAPI_GeneralError) {@zbx_api.login("bad","pass")}
 
@@ -57,9 +60,10 @@ class TC_Test_API_User < Test::Unit::TestCase
   end
 
   def test_01_create_user
-    result=@zbx_api.user.get({"extendoutput"=>true,"limit"=>100})
-    result.map! { |item| item["alias"] }
-    assert_not_nil(result.grep("apitest")[0])
+    result=@zbx_api.user.get({"extendoutput"=>true,"filter"=>{"alias"=>[$api_user]},"limit"=>100})
+#    result.map! { |item| [item["alias"], item["type"]] }
+    assert_not_nil(result[0])
+    assert_equal(3,result[0]["type"].to_i,"Create User requires admin privileges")
 
     assert_nothing_raised(ZbxAPI_GeneralError) {result=@zbx_api.user.create({"name"=>"test", "alias"=>"test", "passwd"=>"test"})}
     @@test_user=result["userids"][0]
@@ -72,8 +76,8 @@ class TC_Test_API_User < Test::Unit::TestCase
     #@zbx_api.debug_level=5
     assert_nothing_raised(ZbxAPI_GeneralError) do
       result=@zbx_api.user.addmedia(
-          {"users"=>[{"userid"=>@@test_user}],
-           "medias"=>[{"active"=>2,"sendto"=>"me@me.com","severity"=>"123456"}]})
+          {"userid"=>@@test_user,"active"=>2,
+           "sendto"=>"me@me.com","severity"=>"123456"})
     end
   end
 
