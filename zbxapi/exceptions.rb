@@ -17,11 +17,12 @@
 
 ##########################################
 # Subversion information
-# $Id: exceptions.rb 258 2010-12-28 22:49:21Z nelsonab $
-# $Revision: 258 $
+# $Id$
+# $Revision$
 ##########################################
 
-require 'libs/zdebug'
+require 'zbxapi/utils'
+require 'zbxapi/zdebug'
 
 #------------------------------------------------------------------------------
 #
@@ -38,9 +39,8 @@ class ZError < RuntimeError
 
   # list of valid params
   # :help_func, the help function with more information for the exception
-  # : retry, is the exception eligable for retry?
+  # : retry, is the exception eligible for retry?
   def initialize(message=nil, params={})
-    raise "Exception not called correctly" if params.class!=Hash if !params.nil?
     @help_func=params[:help_func]
     @message=message
     @local_msg="Error"

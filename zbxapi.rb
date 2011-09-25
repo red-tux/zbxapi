@@ -32,8 +32,9 @@ end
 #setup our search path or libraries
 $: << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
-require 'libs/zdebug'
-require 'libs/api_exceptions.rb'
+require 'zbxapi/revision'
+require 'zbxapi/zdebug'
+require 'zbxapi/api_exceptions.rb'
 require 'uri'
 #require 'net/http'
 require 'net/https'
@@ -108,6 +109,10 @@ class ZabbixAPI
     debug(6,:msg=>"protocol: #{@url.scheme}, host: #{@url.host}")
     debug(6,:msg=>"port: #{@url.port}, path: #{@url.path}")
     debug(6,:msg=>"query: #{@url.query}, fragment: #{@url.fragment}")
+  end
+
+  def self.get_version
+    "#{ZBXAPI_VERSION}.#{ZBXAPI_REVISION}"
   end
 
   #wraps the given information into the appropriate JSON object
