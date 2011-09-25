@@ -48,116 +48,91 @@ module ZDebug
   end
 
   # level - level to show message (Integer)
-  # variable - variable to show (Object)
-  # message - message to be prepended before variable  (String)
-  # overload - do show or error if debug_level is not set
-  def debug(level,variable="",message=nil,truncate=nil,overload=false)
+  # :var - variable to show (Object)
+  # :msg - message to be prepended before variable  (String)
+  # :truncate - truncate var if it is over N characters
+  # :overload - do not show or error if debug_level is not set
+  # :facility - Which debug facility level should also be used
+  # :stack_pos - Stack position to use for calling function information (0==last function)
+  def debug(level,args={})
+    variable=args[:var] || :zzempty
+    message=args[:msg] || nil
+    facility=args[:facility] || nil
+    raise "Facility must be a symbol" if facility && facility.class!=Symbol
+    truncate=args[:truncate] || 0
+    raise "Truncate must be an Integer" if truncate.class!=Fixnum
+    overload=(!args[:overload].nil? && args[:overload]==true) || false
+    stack_pos=args[:stack_pos] || 0
+    raise ":stack_pos must be an Integer" if stack_pos.class!=Fixnum
+
     return if overload
     raise "Call set_debug before using debug" if !defined?(@@debug_level)
-    if level<=@@debug_level
-      #parse the caller array to determine who called us, what line, and what file
-      caller[0]=~/(.*):(\d+):.*`(.*?)'/
 
-      #sometimes the debug function gets called from within an exception block, in which cases the backtrace is not
-      #available.
-      file_tmp=$1.nil? ? "n/a" : $1
-      debug_line=$2.nil? ? "" : $2
-      debug_func=$3.nil? ? "" : $3
-      tmp_split=file_tmp.split("/")
+    if facility
+      facility_level=@@facility_level[facility]
+      raise("Unknown facility type: #{facility.to_s}") if facility_level.nil?
+      show_debug=level<=facility_level
+    else
+      show_debug=level<=@@debug_level
+    end
 
-      if (len=tmp_split.length)>2
-        debug_file=".../#{tmp_split[len-2]}/#{tmp_split[len-1]}"
+    if show_debug
+
+      if facility
+        header="D#{level}(#{facility.to_s})"
       else
-        debug_file=file_tmp
+        header="D#{level}"
       end
 
-      strval=""
+      #parse the caller array to determine who called us, what line, and what file
+      caller[stack_pos]=~/(.*):(\d+):.*`(.*?)'/
+
+      if $1
+        #sometimes the debug function gets called from within an exception block, in which cases the backtrace is not
+        #available.
+        path=$1.split("/")
+        debug_line=$2
+        debug_func=$3
+
+        if (len=path.length)>2
+          debug_file=".../#{path[len-2]}/#{path[len-1]}"
+        else
+          debug_file=path
+        end
+
+        header+=" #{debug_file}:#{debug_func}:#{debug_line}"
+      else
+        header+=" --from exception--"
+      end
+
       if variable.nil?
         strval="nil"
+      elsif variable==:zzempty || variable==""
+        strval=""
       elsif variable.class==String
         strval=variable
-        if !truncate.nil? && truncate>0
-          if truncate<strval.length then
-            o_strval=strval
-            strval=o_strval[0..(truncate/2)]
-            strval+= "  .....  "
-            strval+=o_strval[(o_strval.length-(truncate/2))..o_strval.length]
-          end
-        end
       else
         strval=variable.inspect
-        if !truncate.nil?
-          if truncate<strval.length then
-            o_strval=strval
-            strval=o_strval[0..(truncate/2)]
-            strval+= "  .....  "
-            strval+=o_strval[(o_strval.length-(truncate/2))..o_strval.length]
-          end
-        end
       end
 
-      if !message.nil?
-        strval = message + ": " + strval
+      if truncate>0 && truncate<strval.length
+        o_strval=strval
+        strval=o_strval[0..(truncate/2)]
+        strval+= "  .....  "
+        strval+=o_strval[(o_strval.length-(truncate/2))..o_strval.length]
       end
-      puts "D#{level} #{debug_file}:#{debug_func}:#{debug_line} #{strval}"
+
+      if message
+        strval = variable==:zzempty ?
+            message :
+            message + ": " + strval
+      end
+      puts "#{header} #{strval}"
     end
   end
 
-  # Debug_facility is a copy of the above function in an effort to shorten
-  # code path.
-  # facility - symbol denoting logging facility
-  # level - level to show message (Integer)
-  # variable - variable to show (Object)
-  # message - message to be prepended before variable  (String)
   def debug_facility(facility,level,variable="",message=nil,truncate=nil)
-    facility_level=@@facility_level[facility]
-    raise "Call set_debug before using debug" if !defined?(@@debug_level)
-    raise "Unknown facility type: #{facility.to_s}" if facility_level.nil?
-    if level<=facility_level
-      #parse the caller array to determine who called us, what line, and what file
-      caller[0]=~/(.*):(\d+):.*`(.*?)'/
-
-      file_tmp=$1
-      debug_line=$2
-      debug_func=$3
-      tmp_split=file_tmp.split("/")
-
-      if (len=tmp_split.length)>2
-        debug_file=".../#{tmp_split[len-2]}/#{tmp_split[len-1]}"
-      else
-        debug_file=file_tmp
-      end
-
-      strval=""
-      if variable.nil?
-        strval="nil"
-      elsif variable.class==String
-        strval=variable
-        if !truncate.nil?
-          if truncate<strval.length then
-            o_strval=strval
-            strval=o_strval[0..(truncate/2)]
-            strval+= "  .....  "
-            strval+=o_strval[(o_strval.length-(truncate/2))..o_strval.length]
-          end
-        end
-      else
-        strval=variable.inspect
-        if !truncate.nil?
-          if truncate<strval.length then
-            o_strval=strval
-            strval=o_strval[0..(truncate/2)]
-            strval+= "  .....  "
-            strval+=o_strval[(o_strval.length-(truncate/2))..o_strval.length]
-          end
-        end
-      end
-
-      if !message.nil?
-        strval = message + ": " + strval
-      end
-      puts "D#{level}(#{facility.to_s}) #{debug_file}:#{debug_func}:#{debug_line} #{strval}"
-    end
+    debug(level, :var=>variable, :msg=>message, :truncate=>truncate, :stack_pos=>1)
   end
 
 end  # end Debug module

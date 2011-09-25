@@ -45,7 +45,7 @@ require "api_classes/subclass_base"
 
 class ZbxAPI_Trigger < ZbxAPI_Sub
   def get(options={})
-    debug(8, "Trigger.get Start")
+    debug(8, :msg=>"Trigger.get Start")
     checkauth
     checkversion(1,1)
 
@@ -55,7 +55,7 @@ class ZbxAPI_Trigger < ZbxAPI_Sub
 
   # Function name changed to reflect 1.1 API changes
   def create(options={})
-    debug(8, "Trigger.create Start")
+    debug(8, :msg=>"Trigger.create Start")
     checkauth
     checkversion(1,1)
 

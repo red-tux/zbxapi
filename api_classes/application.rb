@@ -46,7 +46,7 @@ require "api_classes/subclass_base"
 
 class ZbxAPI_Application < ZbxAPI_Sub
   def get(options={})
-    debug(8, "Application.get Start")
+    debug(8, :msg=>"Application.get Start")
     checkauth
     checkversion(1,1)
 
@@ -55,7 +55,7 @@ class ZbxAPI_Application < ZbxAPI_Sub
   end
 
   def create(options={})
-    debug(8, "Application.create Start")
+    debug(8, :msg=>"Application.create Start")
     checkauth
     checkversion(1,1)
 
@@ -70,7 +70,7 @@ class ZbxAPI_Application < ZbxAPI_Sub
   end
 
   def getid(options={})
-    debug(8, "Application.getid Start")
+    debug(8, :msg=>"Application.getid Start")
     checkauth
     checkversion(1,1)
 

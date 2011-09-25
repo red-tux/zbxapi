@@ -59,7 +59,7 @@ class ZbxAPI_Item < ZbxAPI_Sub
   end
 
   def create(options)
-    debug(8,options)
+    debug(8,:var=>options)
     checkauth
     checkversion(1,1)
 

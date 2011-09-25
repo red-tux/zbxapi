@@ -39,7 +39,7 @@ require "api_classes/subclass_base"
 
 class ZbxAPI_Sysmap < ZbxAPI_Sub
   def create(options={})
-    debug(8, "Sysmap.create Start")
+    debug(8, :msg=>"Sysmap.create Start")
     checkauth
     checkversion(1,1)
 
@@ -54,7 +54,7 @@ class ZbxAPI_Sysmap < ZbxAPI_Sub
   end
 
   def addelement(options={})
-    debug(8, "Sysmap.addelement Start")
+    debug(8, :msg=>"Sysmap.addelement Start")
     checkauth
     checkversion(1,1)
 
@@ -63,7 +63,7 @@ class ZbxAPI_Sysmap < ZbxAPI_Sub
   end
 
   def addlink(options={})
-    debug(8, "Sysmap.addlink Start")
+    debug(8, :msg=>"Sysmap.addlink Start")
     checkauth
     checkversion(1,1)
 
@@ -72,7 +72,7 @@ class ZbxAPI_Sysmap < ZbxAPI_Sub
   end
 
   def getseid(options={})
-    debug(8, "Sysmap.getseid Start")
+    debug(8, :msg=>"Sysmap.getseid Start")
     checkauth
     checkversion(1,1)
 
@@ -81,7 +81,7 @@ class ZbxAPI_Sysmap < ZbxAPI_Sub
   end
 
   def addlinktrigger(options={})
-    debug(8, "Sysmap.addlinktrigger Start")
+    debug(8, :msg=>"Sysmap.addlinktrigger Start")
     checkauth
     checkversion(1,1)
 

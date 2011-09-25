@@ -47,7 +47,7 @@ require "api_classes/subclass_base"
 
 class ZbxAPI_HostGroup < ZbxAPI_Sub
   def create(options={})
-    debug(8, "HostGroup.create Start")
+    debug(8, :msg=>"HostGroup.create Start")
     checkauth
     checkversion(1,1)
 
@@ -62,7 +62,7 @@ class ZbxAPI_HostGroup < ZbxAPI_Sub
   end
 
   def get(options={})
-    debug(8, "HostGroup.get Start")
+    debug(8, :msg=>"HostGroup.get Start")
     checkauth
     checkversion(1,1)
 
@@ -76,7 +76,7 @@ class ZbxAPI_HostGroup < ZbxAPI_Sub
   end
 
   def getObjects(name)
-    debug(8, "HostGroup.getId Start")
+    debug(8, :msg=>"HostGroup.getId Start")
     checkauth
     checkversion(1,1)
 

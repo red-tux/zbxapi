@@ -53,7 +53,7 @@ class ZbxAPI_Sub < ZabbixAPI #:nodoc: all
     return @parent.json_obj(method, param)
   end
 
-  def debug(level,param="",message=nil)
-    @parent.debug(level,param,message)
+  def debug(level,args={})
+    @parent.debug(level,args)
   end
 end

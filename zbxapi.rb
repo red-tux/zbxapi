@@ -105,9 +105,9 @@ class ZabbixAPI
     @history = ZbxAPI_History.new(self)
     @id=0
 
-    debug(6,"protocol: #{@url.scheme}, host: #{@url.host}")
-    debug(6,"port: #{@url.port}, path: #{@url.path}")
-    debug(6,"query: #{@url.query}, fragment: #{@url.fragment}")
+    debug(6,:msg=>"protocol: #{@url.scheme}, host: #{@url.host}")
+    debug(6,:msg=>"port: #{@url.port}, path: #{@url.path}")
+    debug(6,:msg=>"query: #{@url.query}, fragment: #{@url.fragment}")
   end
 
   #wraps the given information into the appropriate JSON object
@@ -123,7 +123,7 @@ class ZabbixAPI
         'auth'=>@auth,
         'id'=>@id
       }
-    debug(10, "json_obj:  #{obj}")
+    debug(10, :msg=>"json_obj:  #{obj}")
     return obj.to_json
   end
 
@@ -230,8 +230,8 @@ class ZabbixAPI
   # _params_ are the parameters to be passed to the call
   # returns a hash of the results from the server
   def raw_api(method,params=nil)
-    debug(6,method,"method")
-    debug(6,params,"Parameters")
+    debug(6,:var=>method,:msg=>"method")
+    debug(6,:var=>params,:msg=>"Parameters")
 
     checkauth
     checkversion(1,1)
@@ -269,10 +269,10 @@ class ZabbixAPI
 #    http.start do |http|
       headers={'Content-Type'=>'application/json-rpc',
         'User-Agent'=>'Zbx Ruby CLI'}
-      debug(4,"Sending: #{json_obj}")
+      debug(4,:msg=>"Sending: #{json_obj}")
       response = http.post(@url.path, json_obj,headers)
-      debug(4,"Response Code: #{response.code}")
-      debug(4,response.body,"Response Body",truncate_length)
+      debug(4,:msg=>"Response Code: #{response.code}")
+      debug(4,:var=>response.body,:msg=>"Response Body",:truncate=>truncate_length)
       case response.code.to_i
         when 301
           puts "Redirecting to #{response['location']}"

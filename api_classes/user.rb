@@ -109,7 +109,7 @@ class ZbxAPI_User < ZbxAPI_Sub
   # addmedia expects a hash of the following variables
   # userid, mediatypeid, sendto, severity, active, period
   def addmedia(options)
-    debug(8, "User.addmedia Start")
+    debug(8, :msg=>"User.addmedia Start")
     checkauth
     checkversion(1,1)
 
