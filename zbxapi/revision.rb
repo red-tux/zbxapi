@@ -4,4 +4,4 @@
 #the rakefile was run
 
 ZBXAPI_VERSION="0.1"
-ZBXAPI_REVISION="319"
+ZBXAPI_REVISION="321"
