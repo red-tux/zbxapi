@@ -64,6 +64,7 @@ module ZDebug
     overload=(!args[:overload].nil? && args[:overload]==true) || false
     stack_pos=args[:stack_pos] || 0
     raise ":stack_pos must be an Integer" if stack_pos.class!=Fixnum
+    backtrace_depth=args[:trace_depth] || 0
 
     return if overload
     raise "Call set_debug before using debug" if !defined?(@@debug_level)
@@ -130,6 +131,29 @@ module ZDebug
             message + ": " + strval
       end
       puts "#{header} #{strval}"
+
+      if backtrace_depth>0
+        backtrace=[]
+        (stack_pos..stack_pos+backtrace_depth-1).each do |pos|
+          p caller[pos]
+          next if pos>=caller.length
+
+          caller[pos]=~/(.*):(\d+):.*`(.*?)'/
+          if $1
+            #sometimes the debug function gets called from within an exception block, in which cases the backtrace is not
+            #available.
+            debug_line=$2
+            debug_func=$3
+            path=$1.split("/")  #global vars are changed by split
+
+            path= (len=path.length)>2 ? ".../#{path[len-2]}/#{path[len-1]}" : path
+            backtrace<<"#{path}:#{debug_func}:#{debug_line}"
+          else
+            backtrace<<"Unknown"
+          end
+        end
+        puts "["+backtrace.join("],[")+"]"
+      end
     end
   end
 

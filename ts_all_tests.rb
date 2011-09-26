@@ -29,6 +29,7 @@ $: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
 require "ts_local_vars"
 
 require "test/unit"
+require "api_tests/tc_test_debug"
 require "api_tests/tc_test_user"
 require "api_tests/tc_test_host"
 
@@ -36,6 +37,7 @@ require "api_tests/tc_test_host"
 class TS_All_Tests
    def self.suite
      suite = Test::Unit::TestSuite.new
+     suite << TC_Test_00_Debug
      suite << TC_Test_API_00_User
      suite << TC_Test_API_Host
      return suite
