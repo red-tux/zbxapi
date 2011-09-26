@@ -84,15 +84,17 @@ module ZDebug
         header="D#{level}"
       end
 
+      #Example:  "./libs/lexer.rb:650:in `item'"
       #parse the caller array to determine who called us, what line, and what file
       caller[stack_pos]=~/(.*):(\d+):.*`(.*?)'/
 
       if $1
         #sometimes the debug function gets called from within an exception block, in which cases the backtrace is not
         #available.
-        path=$1.split("/")
+        path=$1
         debug_line=$2
         debug_func=$3
+        path=path.split("/")
 
         if (len=path.length)>2
           debug_file=".../#{path[len-2]}/#{path[len-1]}"
