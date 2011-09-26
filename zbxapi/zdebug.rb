@@ -54,6 +54,7 @@ module ZDebug
   # :overload - do not show or error if debug_level is not set
   # :facility - Which debug facility level should also be used
   # :stack_pos - Stack position to use for calling function information (0==last function)
+  # :trace_depth - Show a backtrace of :trace_depth starting at :stack_pos
   def debug(level,args={})
     variable=args[:var] || :zzempty
     message=args[:msg] || nil
@@ -135,7 +136,7 @@ module ZDebug
       if backtrace_depth>0
         backtrace=[]
         (stack_pos..stack_pos+backtrace_depth-1).each do |pos|
-          p caller[pos]
+          pos+=2 #Need to offset current block
           next if pos>=caller.length
 
           caller[pos]=~/(.*):(\d+):.*`(.*?)'/
@@ -152,7 +153,7 @@ module ZDebug
             backtrace<<"Unknown"
           end
         end
-        puts "["+backtrace.join("],[")+"]"
+        puts " Backtrace(#{stack_pos}..#{stack_pos+backtrace_depth-1}):["+backtrace.join("],[")+"]"
       end
     end
   end
