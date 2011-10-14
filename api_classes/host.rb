@@ -71,6 +71,14 @@ class ZbxAPI_Host < ZbxAPI_Sub
     obj['result']
   end
 
+  def update(options={})
+    checkauth
+    checkversion(1,3)
+
+    obj=do_request(json_obj('host.update',options))
+    obj['result']
+  end
+
   def create_template(options={})
     checkauth
     checkversion(1,3)

@@ -29,6 +29,9 @@
 class ZabbixAPI  #create a stub to be defined later
 end
 
+class ZbxAPI_Sub < ZabbixAPI  #create a stub to be defined later
+end
+
 #setup our search path or libraries
 $: << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
