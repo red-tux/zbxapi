@@ -49,6 +49,7 @@ require "api_classes/history"
 require "api_classes/host"
 require "api_classes/host_group"
 require "api_classes/item"
+require "api_classes/proxy"
 require "api_classes/sysmap"
 require "api_classes/trigger"
 require "api_classes/user"
@@ -73,8 +74,7 @@ class ZabbixAPI
   #subordinate class
   attr_accessor :user # [User#new]
   #subordinate class
-  attr_accessor :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap, :history
-
+  attr_accessor :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap, :history, :proxy
   @id=0
   @auth=''
   @url=nil
@@ -101,6 +101,7 @@ class ZabbixAPI
     @user = ZbxAPI_User.new(self)
     @usergroup = ZbxAPI_UserGroup.new(self)
     @host = ZbxAPI_Host.new(self)
+    @proxy = ZbxAPI_Proxy.new(self)
     @item = ZbxAPI_Item.new(self)
     @hostgroup = ZbxAPI_HostGroup.new(self)
     @application = ZbxAPI_Application.new(self)
