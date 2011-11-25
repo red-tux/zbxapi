@@ -48,6 +48,7 @@ spec = Gem::Specification.new do |s|
      "api_classes/application.rb",
      "api_classes/history.rb", "api_classes/host.rb",
      "api_classes/host_group.rb","api_classes/item.rb",
+     "api_classes/proxy.rb",
      "api_classes/sysmap.rb", "api_classes/trigger.rb",
      "api_classes/user.rb", "api_classes/user_group.rb",
      "api_classes/subclass_base.rb"]
