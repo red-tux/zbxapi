@@ -43,6 +43,7 @@ require 'uri'
 require 'net/https'
 require 'rubygems'
 require 'json'
+require 'pp'
 
 require "api_classes/application"
 require "api_classes/history"
@@ -109,10 +110,16 @@ class ZabbixAPI
     @sysmap = ZbxAPI_Sysmap.new(self)
     @history = ZbxAPI_History.new(self)
     @id=0
+    @proxy=nil
 
     debug(6,:msg=>"protocol: #{@url.scheme}, host: #{@url.host}")
     debug(6,:msg=>"port: #{@url.port}, path: #{@url.path}")
     debug(6,:msg=>"query: #{@url.query}, fragment: #{@url.fragment}")
+  end
+
+  def set_proxy(address,port,user=nil,password=nil)
+    @proxy={:address=>address, :port=>port,
+            :user=>user, :password=>password}
   end
 
   def self.get_version
@@ -195,7 +202,6 @@ class ZabbixAPI
     rescue Errno::ECONNREFUSED
       raise ZbxAPI_ExceptionBadServerUrl
     end
-
   end
 
   def logout
@@ -267,15 +273,16 @@ class ZabbixAPI
   #truncate_length determines how many characters at maximum should be displayed while debugging before
   #truncation should occur.
   def do_request(json_obj,truncate_length=5000)
-    #puts json_obj
     redirects=0
     begin  # This is here for redirects
-      http = Net::HTTP.new(@url.host, @url.port)
+      if @proxy
+        http = Net::HTTP::Proxy(@proxy[:address],@proxy[:port],
+              @proxy[:user],@proxy[:password]).new(@url.host,@url.port)
+      else
+        http = Net::HTTP.new(@url.host, @url.port)
+      end
       http.use_ssl=true if @url.class==URI::HTTPS
       response = nil
-#    http.set_debug_output($stderr)                                  #Uncomment to see low level HTTP debug
-#    http.use_ssl = @url.scheme=='https' ? true : false
-#    http.start do |http|
       headers={'Content-Type'=>'application/json-rpc',
         'User-Agent'=>'Zbx Ruby CLI'}
       debug(4,:msg=>"Sending: #{json_obj}")
