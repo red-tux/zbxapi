@@ -323,7 +323,7 @@ class ZabbixAPI
 			retry if redirects<=5
 			raise ZbxAPI_GeneralError, "Too many redirects"
     rescue NoMethodError
-      raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host}", :retry=>false)
+      raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host} : \"#{e}\"", :retry=>false)
     end
   end
 
