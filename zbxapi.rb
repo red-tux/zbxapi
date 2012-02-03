@@ -201,6 +201,8 @@ class ZabbixAPI
       raise ZbxAPI_ExceptionBadServerUrl
     rescue Errno::ECONNREFUSED
       raise ZbxAPI_ExceptionBadServerUrl
+    rescue => e
+      raise ZbxAPI_ExceptionBadAuth.new('General Login error, check host connectivity.')
     end
   end
 
