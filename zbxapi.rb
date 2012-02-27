@@ -70,7 +70,7 @@ class ZabbixAPI
 
   include ZDebug
 
-  attr_accessor :method, :params, :debug_level, :auth
+  attr_accessor :method, :params, :debug_level, :auth, :verify_ssl
 
   #subordinate class
   attr_accessor :user # [User#new]
@@ -79,6 +79,7 @@ class ZabbixAPI
   @id=0
   @auth=''
   @url=nil
+  @verify_ssl = true
 
   private
     @user_name=''
@@ -284,6 +285,9 @@ class ZabbixAPI
         http = Net::HTTP.new(@url.host, @url.port)
       end
       http.use_ssl=true if @url.class==URI::HTTPS
+      if ! @verify_ssl
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE if @url.class==URI::HTTPS
+      end
       response = nil
       headers={'Content-Type'=>'application/json-rpc',
         'User-Agent'=>'Zbx Ruby CLI'}
