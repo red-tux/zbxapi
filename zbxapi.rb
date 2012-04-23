@@ -272,22 +272,27 @@ class ZabbixAPI
 
   end
 
+  def get_http_obj
+    if @proxy
+      http = Net::HTTP::Proxy(@proxy[:address],@proxy[:port],
+            @proxy[:user],@proxy[:password]).new(@url.host,@url.port)
+    else
+      http = Net::HTTP.new(@url.host, @url.port)
+    end
+    http.use_ssl=true if @url.class==URI::HTTPS
+    if ! @verify_ssl
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if @url.class==URI::HTTPS
+    end
+    http
+  end
+
   #Sends JSON encoded string to server
   #truncate_length determines how many characters at maximum should be displayed while debugging before
   #truncation should occur.
   def do_request(json_obj,truncate_length=5000)
     redirects=0
     begin  # This is here for redirects
-      if @proxy
-        http = Net::HTTP::Proxy(@proxy[:address],@proxy[:port],
-              @proxy[:user],@proxy[:password]).new(@url.host,@url.port)
-      else
-        http = Net::HTTP.new(@url.host, @url.port)
-      end
-      http.use_ssl=true if @url.class==URI::HTTPS
-      if ! @verify_ssl
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE if @url.class==URI::HTTPS
-      end
+      http=get_http_obj
       response = nil
       headers={'Content-Type'=>'application/json-rpc',
         'User-Agent'=>'Zbx Ruby CLI'}
