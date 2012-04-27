@@ -46,6 +46,7 @@ require 'json'
 require 'pp'
 
 require "api_classes/application"
+require "api_classes/graph"
 require "api_classes/history"
 require "api_classes/host"
 require "api_classes/host_group"
@@ -75,7 +76,7 @@ class ZabbixAPI
   #subordinate class
   attr_accessor :user # [User#new]
   #subordinate class
-  attr_accessor :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap, :history, :proxy
+  attr_accessor :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap, :history, :proxy, :graph
   @id=0
   @auth=''
   @url=nil
@@ -110,6 +111,7 @@ class ZabbixAPI
     @trigger = ZbxAPI_Trigger.new(self)
     @sysmap = ZbxAPI_Sysmap.new(self)
     @history = ZbxAPI_History.new(self)
+    @graph = ZbxAPI_Graph.new(self)
     @id=0
     @proxy=nil
 
