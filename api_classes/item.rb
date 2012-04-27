@@ -67,6 +67,15 @@ class ZbxAPI_Item < ZbxAPI_Sub
     return obj['result']
   end
 
+  def update(options)
+    debug(8,:var=>options)
+    checkauth
+    checkversion(1,1)
+
+    obj=do_request(json_obj('item.update', options))
+    return obj['result']
+  end
+
   # Alias function for code written against 1.0 API
   def add(options)
     puts "WARNING API Function Item.add is deprecated and will be removed in the future without further warning"
