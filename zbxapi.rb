@@ -113,7 +113,7 @@ class ZabbixAPI
     @history = ZbxAPI_History.new(self)
     @graph = ZbxAPI_Graph.new(self)
     @id=0
-    @proxy=nil
+    @http_proxy=nil
 
     debug(6,:msg=>"protocol: #{@url.scheme}, host: #{@url.host}")
     debug(6,:msg=>"port: #{@url.port}, path: #{@url.path}")
@@ -121,7 +121,7 @@ class ZabbixAPI
   end
 
   def set_proxy(address,port,user=nil,password=nil)
-    @proxy={:address=>address, :port=>port,
+    @http_proxy={:address=>address, :port=>port,
             :user=>user, :password=>password}
   end
 
@@ -188,7 +188,7 @@ class ZabbixAPI
       @auth=result['result']
 
       #setup the version variables
-      @major,@minor=do_request(json_obj('APIInfo.version',{}))['result'].split('.')
+      @major,@minor=do_request(json_obj('apiinfo.version',{}))['result'].split('.')
       @major=@major.to_i
       @minor=@minor.to_i
     rescue ZbxAPI_ExceptionLoginPermission => e
@@ -275,9 +275,9 @@ class ZabbixAPI
   end
 
   def get_http_obj
-    if @proxy
-      http = Net::HTTP::Proxy(@proxy[:address],@proxy[:port],
-            @proxy[:user],@proxy[:password]).new(@url.host,@url.port)
+    if @http_proxy
+      http = Net::HTTP::Proxy(@http_proxy[:address],@http_proxy[:port],
+            @http_proxy[:user],@http_proxy[:password]).new(@url.host,@url.port)
     else
       http = Net::HTTP.new(@url.host, @url.port)
     end
@@ -335,7 +335,7 @@ class ZabbixAPI
 		  redirects+=1
 			retry if redirects<=5
 			raise ZbxAPI_GeneralError, "Too many redirects"
-    rescue NoMethodError
+    rescue NoMethodError => e
       raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host} : \"#{e}\"", :retry=>false)
     end
   end
