@@ -17,8 +17,8 @@
 
 ##########################################
 # Subversion information
-# $Id$
-# $Revision$
+# $Id: zdebug.rb 337 2011-10-14 16:11:39Z nelsonab $
+# $Revision: 337 $
 ##########################################
 
 module ZDebug

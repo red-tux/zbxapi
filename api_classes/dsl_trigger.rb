@@ -19,41 +19,30 @@
 #--
 ##########################################
 # Subversion information
-# $Id: zbxapi.rb 281 2011-04-06 18:10:16Z nelsonab $
-# $Revision: 281 $
+# $Id: dsl_trigger.rb 395 2012-05-18 03:49:48Z nelsonab $
+# $Revision: 395 $
 ##########################################
 #++
 
-require "api_classes/subclass_base"
+require "api_classes/api_dsl"
 
-
-#******************************************************************************
-#
-# Class ZbxAPI_History
-#
-# Class encapsulating history functions
-#
-# get
-#
-#******************************************************************************
-
-class ZbxAPI_History
-
-  def initialize(server)
-    @server=server
-  end
-
-  #Get the history for an item.
-  # itemids is a required option
-  # example: get({"itemids"=>12345})
-  def get(options)
-    @server.checkauth
-    @server.checkversion(1,3)
-
-    raise ZbxAPI_ParameterError, "Missing 'itemid'", "History.get" if options["itemids"].nil?
-
-    p obj=@server.raw_api("history.get",options)
-    return obj['result']
-  end
-
+class Trigger < ZabbixAPI_Base
 end
+
+Trigger.addDependencies
+Trigger.create
+Trigger.delete
+Trigger.deleteDependencies
+Trigger.exists
+Trigger.get do
+  add_valid_params "1.3", ['triggerids', "select_functions", "nodeids", "groupids", "templateids",
+      "hostids", "itemids", "applicationids", "functions", "inherited", "templated", "monitored",
+      "active", "maintenance", "withUnacknowledgedEvents", "withAcknowledgedEvents",
+      "withLastEventUnacknowledged", "skipDependent", "editable", "lastChangeSince",
+      "lastChangeTill", "filter", "group", "host", "only_true", "min_severity", "search",
+      "startSearch", "excludeSearch", "searchWildcardsEnabled", "output", "expandData",
+      "expandDescription", "select_groups", "select_hosts", "select_items", "select_dependencies",
+      "countOutput", "groupOutput", "preservekeys", "sortfield", "sortorder", "limit"]
+end
+Trigger.update
+

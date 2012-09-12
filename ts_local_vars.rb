@@ -1,8 +1,5 @@
-#!/usr/bin/ruby
-
-#GPL 2.0  http://www.gnu.org/licenses/gpl-2.0.html
-#Zabbix CLI Tool and associated files
-#Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
+#License:: GPL 2.0  http://www.gnu.org/licenses/gpl-2.0.html
+#Copyright:: Copyright (C) 2009,2010 Andrew Nelson nelsonab(at)red-tux(dot)net
 #
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License
@@ -20,27 +17,13 @@
 
 ##########################################
 # Subversion information
-# $Id: defines.rb 337 2011-10-14 16:11:39Z nelsonab $
-# $Revision: 337 $
+# $Id$
+# $Revision$
 ##########################################
 
-# Zabbix constants
+#This is the file which contains the variables used for unit testing
+#this file must be copied to "ts_local_vars.rb" to be used.
 
-# Sysmap elements (Create Element Type drop down menu):
-ME_HOST=0
-ME_MAP=1
-ME_TRIGGER=2
-ME_HOSTGROUP=3
-ME_IMAGE=4
-
-# Sysmap connection draw type
-MC_DT_LINE=1
-MC_DT_BOLD=2
-MC_DT_DOT=3
-MC_DT_DASHED=4
-
-# Sysmap label location
-ML_BOTTOM=0
-ML_LEFT=1
-ML_RIGHT=2
-ML_TOP=3
+$server="http://192.168.166.10"
+$api_user="apitest"
+$api_pass="apitest"

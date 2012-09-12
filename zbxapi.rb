@@ -29,34 +29,25 @@
 class ZabbixAPI  #create a stub to be defined later
 end
 
-class ZbxAPI_Sub < ZabbixAPI  #create a stub to be defined later
-end
-
 #setup our search path or libraries
 $: << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
-require 'zbxapi/revision'
+#require 'zbxapi/revision'
 require 'zbxapi/zdebug'
 require 'zbxapi/api_exceptions.rb'
+require 'zbxapi/result'
 require 'uri'
-#require 'net/http'
 require 'net/https'
 require 'rubygems'
 require 'json'
-require 'pp'
 
-require "api_classes/application"
-require "api_classes/graph"
-require "api_classes/history"
-require "api_classes/host"
-require "api_classes/host_group"
-require "api_classes/item"
-require "api_classes/proxy"
-require "api_classes/sysmap"
-require "api_classes/trigger"
-require "api_classes/user"
-require "api_classes/user_group"
+require "api_classes/api_dsl"
 
+#Dynamicly load all API description files
+dir=File.dirname(__FILE__)+"/api_classes/"
+Dir[dir + 'dsl_*.rb'].each do |file|
+   require dir+File.basename(file, File.extname(file))
+end
 
 
 #------------------------------------------------------------------------------
@@ -73,18 +64,15 @@ class ZabbixAPI
 
   attr_accessor :method, :params, :debug_level, :auth, :verify_ssl
 
-  #subordinate class
-  attr_accessor :user # [User#new]
-  #subordinate class
-  attr_accessor :usergroup, :host, :item, :hostgroup, :application, :trigger, :sysmap, :history, :proxy, :graph
   @id=0
   @auth=''
   @url=nil
-  @verify_ssl = true
+  @verify_ssl=true
 
   private
     @user_name=''
     @password=''
+    @proxy_server=nil
 
 
     class Redirect < Exception #:nodoc: all
@@ -92,37 +80,75 @@ class ZabbixAPI
 
   public
 
+  class << self
+    public :define_method
+  end
+
   # The initialization routine for the Zabbix API class
   # * url is a string defining the url to connect to, it should only point to the base url for Zabbix, not the api directory
   # * debug_level is the default level to be used for debug messages
   # Upon successful initialization the class will be set up to allow a connection to the Zabbix server
   # A connection however will not have been made, to actually connect to the Zabbix server use the login method
-  def initialize(url,debug_level=0)
-    set_debug_level(debug_level)
+  #options:
+  #Parameter        Default                Description
+  #:debug           0                      Debug Level
+  #:returntype      :result                Return the value of "result" from the json result
+  #:verify_ssl      true                   Enable checking the SSL Cert
+  def initialize(url,*args)
+    options=args[0]
+    options ||= {}
+    if options.is_a?(Fixnum)
+      warn "WARNING: Initialization has changed, backwards compatability is being used."
+      warn "WARNING: Use ZabbixAPI.new(url,:debug=>n,:returntype=>:result) to have the"
+      warn "WARNING: same capability as previous versions."
+      warn "WARNING: This depreciated functionality will be removed in a future release"
+      options={:debug=>0,:returntype=>:result}
+    end
+
+    set_debug_level(options[:debug] || 0)
+    @returntype=options[:returntype] || :result
+    @verify_ssl=options[:verify_ssl] || true
     @orig_url=url  #save the original url
     @url=URI.parse(url+'/api_jsonrpc.php')
-    @user = ZbxAPI_User.new(self)
-    @usergroup = ZbxAPI_UserGroup.new(self)
-    @host = ZbxAPI_Host.new(self)
-    @proxy = ZbxAPI_Proxy.new(self)
-    @item = ZbxAPI_Item.new(self)
-    @hostgroup = ZbxAPI_HostGroup.new(self)
-    @application = ZbxAPI_Application.new(self)
-    @trigger = ZbxAPI_Trigger.new(self)
-    @sysmap = ZbxAPI_Sysmap.new(self)
-    @history = ZbxAPI_History.new(self)
-    @graph = ZbxAPI_Graph.new(self)
+
+    #Generate the list of sub objects dynamically, from all objects
+    #derived from ZabbixAPI_Base
+    objects=Object.constants.map do |i|
+      obj=Object.const_get(i.intern)
+      if obj.is_a?(Class) && ([ZabbixAPI_Base]-obj.ancestors).empty?
+        obj
+      else
+        nil
+      end
+    end.compact-[ZabbixAPI_Base]
+
+    @objects={}
+
+    objects.each do |i|
+      i_s=i.to_s.downcase.intern
+      @objects[i_s]=i.new(self)
+      self.class.define_method(i_s) do
+        instance_variable_get(:@objects)[i_s]
+      end
+    end
+
     @id=0
-    @http_proxy=nil
 
     debug(6,:msg=>"protocol: #{@url.scheme}, host: #{@url.host}")
     debug(6,:msg=>"port: #{@url.port}, path: #{@url.path}")
     debug(6,:msg=>"query: #{@url.query}, fragment: #{@url.fragment}")
+
+    if block_given?
+      puts "block"
+      yield(self)
+    end
   end
 
+  #Configure the information for the proxy server to be used to connect to the
+  #Zabbix server
   def set_proxy(address,port,user=nil,password=nil)
-    @http_proxy={:address=>address, :port=>port,
-            :user=>user, :password=>password}
+    @proxy_server={:address=>address,:port=>port,
+                   :user=>user, :password=>password}
   end
 
   def self.get_version
@@ -188,7 +214,7 @@ class ZabbixAPI
       @auth=result['result']
 
       #setup the version variables
-      @major,@minor=do_request(json_obj('apiinfo.version',{}))['result'].split('.')
+      @major,@minor=do_request(json_obj('APIInfo.version',{}))['result'].split('.')
       @major=@major.to_i
       @minor=@minor.to_i
     rescue ZbxAPI_ExceptionLoginPermission => e
@@ -207,6 +233,7 @@ class ZabbixAPI
     rescue => e
       raise ZbxAPI_ExceptionBadAuth.new('General Login error, check host connectivity.')
     end
+
   end
 
   def logout
@@ -274,15 +301,36 @@ class ZabbixAPI
 
   end
 
-  def get_http_obj
-    if @http_proxy
-      http = Net::HTTP::Proxy(@http_proxy[:address],@http_proxy[:port],
-            @http_proxy[:user],@http_proxy[:password]).new(@url.host,@url.port)
+  #api_call
+  #This is the main function for performing api requests
+  #method is a string denoting the method to call
+  #options is a hash of options to be passed to the function
+  def api_call(method,options={})
+    debug(6,:msg=>"Method",:var=>method)
+    debug(6,:msg=>"Options",:var=>options)
+
+    obj=json_obj(method,options)
+    result=do_request(obj)
+    if @returntype==:result
+      result["result"]
+    else
+      result.merge!({:method=>method, :params=>options})
+      @returntype.new(result)
+    end
+  end
+
+  private
+
+  #Select the http object to be used.
+  def select_http_obj
+    if @proxy_server
+      http = Net::HTTP::Proxy(@proxy_server[:address],@proxy_server[:port],
+            @proxy_server[:user],@proxy_server[:password]).new(@url.host,@url.port)
     else
       http = Net::HTTP.new(@url.host, @url.port)
     end
     http.use_ssl=true if @url.class==URI::HTTPS
-    if ! @verify_ssl
+    if !@verify_ssl
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE if @url.class==URI::HTTPS
     end
     http
@@ -294,8 +342,9 @@ class ZabbixAPI
   def do_request(json_obj,truncate_length=5000)
     redirects=0
     begin  # This is here for redirects
-      http=get_http_obj
+      http=select_http_obj
       response = nil
+#    http.set_debug_output($stderr)                                  #Uncomment to see low level HTTP debug
       headers={'Content-Type'=>'application/json-rpc',
         'User-Agent'=>'Zbx Ruby CLI'}
       debug(4,:msg=>"Sending: #{json_obj}")
@@ -310,7 +359,6 @@ class ZabbixAPI
         when 500
           raise ZbxAPI_GeneralError.new("Zabbix server returned an internal error\n Call: #{json_obj}", :retry=>true)
       end
-#    end
 
       @id+=1  # increment the ID value for the API call
 
@@ -335,12 +383,10 @@ class ZabbixAPI
 		  redirects+=1
 			retry if redirects<=5
 			raise ZbxAPI_GeneralError, "Too many redirects"
-    rescue NoMethodError => e
-      raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host} : \"#{e}\"", :retry=>false)
+    rescue NoMethodError
+      raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host}: \"#{e}\"", :retry=>false)
     end
   end
-
-  private
 
   def setup_connection
     @http=Net::HTTP.new(@url.host, @url.port)
@@ -352,54 +398,11 @@ end
 
 
 if __FILE__ == $0
+  require 'pp'
 
-puts "Performing login"
-zbx_api = ZabbixAPI.new('http://localhost')
-zbx_api.login('apitest','test')
-
-puts
-puts "Getting user groups"
-p zbx_api.usergroup.get
-
-puts
-puts "testing user.get"
-zbx_api.debug_level=8
-p zbx_api.user.get()
-p zbx_api.user.get({"extendoutput"=>true})
-zbx_api.debug_level=0
-
-
-puts
-puts "Getting by username, admin, number should be seen"
-p zbx_api.user.getid('admin')
-puts "Trying a bogus username"
-p zbx_api.user.getid('bogus')
-
-puts
-puts "adding the user 'test' to Zabbix"
-uid= zbx_api.user.create(
-  [{ "name"=>"test",
-    "alias"=>"testapiuser",
-    "password"=>"test",
-    "url"=>"",
-    "autologin"=>0,
-    "autologout"=>900,
-    "theme"=>"default.css",
-    "refresh"=>60,
-    "rows_per_page"=>50,
-    "lang"=>"en_GB",
-    "type"=>3}])
-p uid
-puts "Deleting userid #{uid.keys[0]}"
-p zbx_api.user.delete(uid.values[0])
-
-puts
-puts "getting items"
-p zbx_api.item.get
-
-puts
-puts "getting items by host"
-puts "host: #{hosts.values[0]}"
-p items=zbx_api.item.get({'hostids'=>hosts.values[0]})
+  zbx=ZabbixAPI.new("http://zabbix.example.com/")
+  #zbx.set_proxy("localhost",3128)
+  zbx.login("user","password")
+  pp zbx.host.get("output"=>"extend")
 
 end

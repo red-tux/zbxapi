@@ -19,29 +19,21 @@
 #--
 ##########################################
 # Subversion information
-# $Id$
-# $Revision$
+# $Id: dsl_usergroup.rb 340 2011-10-14 23:22:06Z nelsonab $
+# $Revision: 340 $
 ##########################################
 #++
 
-require "api_classes/subclass_base"
+require "api_classes/api_dsl"
 
-
-#******************************************************************************
-#
-# Class ZbxAPI_Proxy
-#
-# Class encapsulating proxy functions
-#
-# get
-#
-#******************************************************************************
-
-class ZbxAPI_Proxy< ZbxAPI_Sub
-  def get(options={})
-    checkauth
-    checkversion(1,3)
-    obj=do_request(json_obj('proxy.get',options))
-    obj['result']
-  end
+class UserGroup < ZabbixAPI_Base
 end
+
+UserGroup.get
+UserGroup.exists
+UserGroup.create
+UserGroup.update
+UserGroup.delete
+UserGroup.massadd
+UserGroup.massupdate
+UserGroup.massremove

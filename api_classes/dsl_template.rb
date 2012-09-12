@@ -19,41 +19,21 @@
 #--
 ##########################################
 # Subversion information
-# $Id: zbxapi.rb 281 2011-04-06 18:10:16Z nelsonab $
-# $Revision: 281 $
+# $Id: dsl_template.rb 340 2011-10-14 23:22:06Z nelsonab $
+# $Revision: 340 $
 ##########################################
 #++
 
-require 'zbxapi'
+require "api_classes/api_dsl"
 
-# Class: Zbx_API_Sub
-# Wrapper class to ensure all class calls goes to the parent object not the
-# currently instantiated object.
-# Also ensures class specific variable sanity for global functions
-class ZbxAPI_Sub < ZabbixAPI #:nodoc: all
-  attr_accessor :parent
-
-  def initialize(parent)
-    @parent=parent
-  end
-
-  def checkauth
-    @parent.checkauth
-  end
-
-  def checkversion(major,minor,options=nil)
-    @parent.checkversion(major,minor,options)
-  end
-
-  def do_request(req)
-    return @parent.do_request(req)
-  end
-
-  def json_obj(method, param)
-    return @parent.json_obj(method, param)
-  end
-
-  def debug(level,args={})
-    @parent.debug(level,args)
-  end
+class Template < ZabbixAPI_Base
 end
+
+Template.get
+Template.exists
+Template.create
+Template.update
+Template.delete
+Template.massadd
+Template.massupdate
+Template.massremove

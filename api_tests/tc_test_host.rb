@@ -13,7 +13,7 @@ class TC_Test_API_Host < Test::Unit::TestCase
     @api_user=$api_user.nil? ? "apitest" : $api_user
     @api_pass=$api_pass.nil? ? "apitest" : $api_pass
 
-    @zbx_api = ZabbixAPI.new(@server)
+    @zbx_api = ZabbixAPI.new(@server,:returnttype=>ApiResult)
     @zbx_api.login(@api_user,@api_pass)
 
   end
@@ -30,14 +30,20 @@ class TC_Test_API_Host < Test::Unit::TestCase
     assert_nothing_raised(ZbxAPI_GeneralError) do
       result =@zbx_api.host.create({"host"=>"test_server", "dns"=>"host.example.com", "proxy_hostid"=>0,
                                    "groups"=>[{"groupid"=>1}], "useip"=>0})
-      @@id=result["hostids"][0].to_i
+#      @@id=result["hostids"][0].to_i
     end
 
   end
 
   def test_99_delete_host
+    id=-1
     assert_nothing_raised(ZbxAPI_GeneralError) do
-      @zbx_api.host.delete(@@id)
+      result=@zbx_api.host.get("filter"=>{"host"=>["test_server"]})
+      id = result[0]["hostid"].to_i
+    end
+
+    assert_nothing_raised(ZbxAPI_GeneralError) do
+      @zbx_api.host.delete(id)
     end
 
   end

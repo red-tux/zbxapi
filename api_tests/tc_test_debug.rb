@@ -17,8 +17,8 @@
 
 ##########################################
 # Subversion information
-# $Id$
-# $Revision$
+# $Id: tc_test_debug.rb 337 2011-10-14 16:11:39Z nelsonab $
+# $Revision: 337 $
 ##########################################
 
 require 'rubygems'
@@ -81,7 +81,9 @@ class TC_Test_00_Debug < Test::Unit::TestCase
       debug(1,:trace_depth=>3)
     end
 
-    assert_match(/^\[.+zdebug\.rb:each:\d+.+zdebug\.rb:debug:\d+.+tc_test_debug\.rb:test_00_debug_25:\d+\]$/,out.string)
+    #puts out.string.length
+
+    assert_equal(230,out.string.length,"230 characters are expected from this debug test")
   end
 
 

@@ -19,38 +19,15 @@
 #--
 ##########################################
 # Subversion information
-# $Id: zbxapi.rb 281 2011-04-06 18:10:16Z nelsonab $
-# $Revision: 281 $
+# $Id: dsl_history.rb 337 2011-10-14 16:11:39Z nelsonab $
+# $Revision: 337 $
 ##########################################
 #++
 
-require "api_classes/subclass_base"
+require "api_classes/api_dsl"
 
-#******************************************************************************
-#
-# Class ZbxAPI_UserGroup
-#
-# Class encapsulating User Group functions
-#
-# API Function          Status
-# get                   Basic function implemented
-# getid
-# create
-# update
-# updaterights
-# addrights
-# addusers
-# removeusers
-# delete
-#
-#******************************************************************************
-
-class ZbxAPI_UserGroup < ZbxAPI_Sub
-  def get(options={})
-    checkauth
-    checkversion(1,1)
-
-    obj=do_request(json_obj('usergroup.get',options))
-    return obj['result']
-  end
+class History < ZabbixAPI_Base
 end
+
+History.get
+History.delete

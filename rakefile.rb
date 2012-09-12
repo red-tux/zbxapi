@@ -22,9 +22,12 @@
 ##########################################
 
 require 'rubygems'
-require 'rake/gempackagetask'
+require 'rake'
+require 'rake/rdoctask'
+require 'rubygems/package_task'
+require 'rake/testtask'
 
-$version = "0.1"
+$version = "0.2"
 $rev = %x[svn -R info * 2>&1 | grep Revis | cut -f2 -d" "|sort -ur|head -1].chop.to_i
 
 
@@ -43,15 +46,9 @@ spec = Gem::Specification.new do |s|
   s.require_paths =["."]
   s.files =
     ["zbxapi.rb", "zbxapi/zdebug.rb", "zbxapi/api_exceptions.rb",
-     "zbxapi/exceptions.rb", "zbxapi/revision.rb",
-     "zbxapi/utils.rb",
-     "api_classes/application.rb",
-     "api_classes/history.rb", "api_classes/host.rb",
-     "api_classes/host_group.rb","api_classes/item.rb",
-     "api_classes/proxy.rb", "api_classes/graph.rb",
-     "api_classes/sysmap.rb", "api_classes/trigger.rb",
-     "api_classes/user.rb", "api_classes/user_group.rb",
-     "api_classes/subclass_base.rb"]
+     "zbxapi/exceptions.rb", "zbxapi/utils.rb", "zbxapi/result.rb",
+     "api_classes/api_dsl.rb",
+     Dir["api_classes/dsl*.rb"]].flatten
 end
 
 
@@ -83,12 +80,21 @@ task :cleanup do
 end
 
 desc "Build dependencies to test Zabcon"
-task :test => [:update_revision, :checkout_zbxapi]
+task :test => [:update_revision]
+
+#task :test => [:update_revision, :checkout_zbxapi]
 
 
-task :default => [:update_revision, :package]
+task :default => [:test, :package]
 
-Rake::GemPackageTask.new(spec) do |pkg|
+Gem::PackageTask.new(spec) do |pkg|
   pkg.package_dir = "gems"
 #  pkg.version = "0.1.#{$rev}"
 end
+
+Rake::TestTask.new do |t|
+  require "ts_local_vars"
+  t.test_files = FileList['api_tests/tc*.rb']
+  t.verbose = true
+end
+

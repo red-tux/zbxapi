@@ -17,8 +17,8 @@
 
 ##########################################
 # Subversion information
-# $Id$
-# $Revision$
+# $Id: test_utilities.rb 337 2011-10-14 16:11:39Z nelsonab $
+# $Revision: 337 $
 ##########################################
 
 #credit goes to: http://thinkingdigitally.com/archive/capturing-output-from-puts-in-ruby/

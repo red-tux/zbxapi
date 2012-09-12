@@ -3,5 +3,5 @@
 #This file contains the latest SVN revision number at the time
 #the rakefile was run
 
-ZBXAPI_VERSION="0.1"
-ZBXAPI_REVISION="397"
+ZBXAPI_VERSION="0.2"
+ZBXAPI_REVISION="408"
