@@ -26,7 +26,14 @@
 $: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 #import variables which describe our local test environment
-require "ts_local_vars"
+begin
+  require "ts_local_vars"
+rescue LoadError
+  puts "ERROR: ts_local_vars.rb has not been configured.  Copy the"
+  puts "ERROR: ts_local_vars.rb_template file to ts_local_vars.rb"
+  puts "ERROR: and alter the file to contain the correct information."
+  exit(1)
+end
 
 require "test/unit"
 require "api_tests/tc_test_debug"

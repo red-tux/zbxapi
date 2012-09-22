@@ -62,17 +62,17 @@ class ZabbixAPI
 
   include ZDebug
 
-  attr_accessor :method, :params, :debug_level, :auth, :verify_ssl
+  attr_accessor :method, :params, :debug_level, :auth, :verify_ssl, :proxy_server
 
   @id=0
   @auth=''
   @url=nil
   @verify_ssl=true
+  @proxy_server=nil
 
   private
     @user_name=''
     @password=''
-    @proxy_server=nil
 
 
     class Redirect < Exception #:nodoc: all
@@ -149,6 +149,7 @@ class ZabbixAPI
   def set_proxy(address,port,user=nil,password=nil)
     @proxy_server={:address=>address,:port=>port,
                    :user=>user, :password=>password}
+    return self
   end
 
   def self.get_version
@@ -234,6 +235,7 @@ class ZabbixAPI
       raise ZbxAPI_ExceptionBadAuth.new('General Login error, check host connectivity.')
     end
 
+    return self
   end
 
   def logout
