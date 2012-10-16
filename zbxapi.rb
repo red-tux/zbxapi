@@ -107,9 +107,14 @@ class ZabbixAPI
 
     set_debug_level(options[:debug] || 0)
     @returntype=options[:returntype] || :result
-    @verify_ssl=options[:verify_ssl] || true
     @orig_url=url  #save the original url
     @url=URI.parse(url+'/api_jsonrpc.php')
+
+    if options.has_key?:verify_ssl
+      @verify_ssl=options[:verify_ssl]
+    else
+      @verify_ssl = true
+    end
 
     #Generate the list of sub objects dynamically, from all objects
     #derived from ZabbixAPI_Base
