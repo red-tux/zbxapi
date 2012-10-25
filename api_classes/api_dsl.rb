@@ -141,7 +141,7 @@ class ZabbixAPI_Method
     if valid_params  #continue to see if there's a required param
       raise ArgumentError.new("Named Arguments (Hash) expected for #{@apiclass}.#{@apimethod},"\
                               " '#{params.class}' received: #{params.inspect}") if !params.is_a?(Hash)
-      args=params.keys
+      args=params.keys.map{|key|key.to_s}
 
       invalid_args=args-valid_params
       debug(9,:msg=>"Invalid args",:var=>invalid_args)
@@ -300,7 +300,7 @@ class ZabbixAPI_Base
       if (params.length>1)
         raise ArgumentError.new("Hash or one argument expected for #{self.class}.#{sym.to_s}, received: #{params.inspect}")
       end
-      self.class.api_methods[sym].do(@server,params.first)
+      self.class.api_methods[sym].do(@server,params.first||{})
     end
   end
 end
