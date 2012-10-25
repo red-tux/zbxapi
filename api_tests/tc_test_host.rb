@@ -35,6 +35,10 @@ class TC_Test_API_Host < Test::Unit::TestCase
 
   end
 
+  def test_02_get_host_with_no_arguments
+    assert_nothing_raised(ArgumentError){result=@zbx_api.host.get}
+  end
+
   def test_99_delete_host
     id=-1
     assert_nothing_raised(ZbxAPI_GeneralError) do

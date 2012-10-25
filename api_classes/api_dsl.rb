@@ -300,7 +300,7 @@ class ZabbixAPI_Base
       if (params.length>1)
         raise ArgumentError.new("Hash or one argument expected for #{self.class}.#{sym.to_s}, received: #{params.inspect}")
       end
-      self.class.api_methods[sym].do(@server,params.first)
+      self.class.api_methods[sym].do(@server,params.first||{})
     end
   end
 end
