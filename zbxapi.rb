@@ -49,6 +49,12 @@ Dir[dir + 'dsl_*.rb'].each do |file|
    require dir+File.basename(file, File.extname(file))
 end
 
+def silence_warnings
+  old_verbose, $VERBOSE = $VERBOSE, nil
+  yield
+ensure
+  $VERBOSE = old_verbose
+end
 
 #------------------------------------------------------------------------------
 #
@@ -118,14 +124,17 @@ class ZabbixAPI
 
     #Generate the list of sub objects dynamically, from all objects
     #derived from ZabbixAPI_Base
-    objects=Object.constants.map do |i|
-      obj=Object.const_get(i.intern)
-      if obj.is_a?(Class) && ([ZabbixAPI_Base]-obj.ancestors).empty?
-        obj
-      else
-        nil
-      end
-    end.compact-[ZabbixAPI_Base]
+    objects=TRUE
+    silence_warnings do
+      objects=Object.constants.map do |i|
+        obj=Object.const_get(i.intern)
+        if obj.is_a?(Class) && ([ZabbixAPI_Base]-obj.ancestors).empty?
+          obj
+        else
+          nil
+        end
+      end.compact-[ZabbixAPI_Base]
+    end
 
     @objects={}
 

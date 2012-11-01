@@ -23,7 +23,9 @@
 # $Revision$
 ##########################################
 
-$: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
+#$: <<
+CURRENT_DIR=File.expand_path(File.join(File.dirname(__FILE__), '.'))
+$LOAD_PATH<<CURRENT_DIR
 
 #import variables which describe our local test environment
 begin
@@ -34,6 +36,7 @@ rescue LoadError
   puts "ERROR: and alter the file to contain the correct information."
   exit(1)
 end
+
 
 require "test/unit"
 require "api_tests/tc_test_debug"
