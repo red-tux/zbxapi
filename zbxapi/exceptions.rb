@@ -109,13 +109,6 @@ end
 
 #----------------------------------------------------------
 
-class ParseError < ZError
-  def initialize(message=nil, params=nil)
-    super(message, params)
-    @local_msg="Parse Error"
-  end
-end
-
 class ReturnError < ZError
 
 end
