@@ -18,7 +18,7 @@ class Host < ZabbixAPI_Base
                              "editable","filter","search","startSearch","excludeSearch",
                              "searchWildcardsEnabled","output","select_groups","selectParentTemplates",
                              "select_items","select_triggers","select_graphs","select_applications",
-                             "select_macros","select_profile","countOutput","groupOutput",
+                             "selectInterfaces","select_macros","select_profile","countOutput","groupOutput",
                              "preservekeys","sortfield","sortorder","limit","extendoutput"]
   end
 
