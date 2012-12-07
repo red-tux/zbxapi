@@ -53,6 +53,8 @@ class Host < ZabbixAPI_Base
   end
 
   action :exists do
+
+  end
     add_valid_params "1.3", ["nodeids","hostid","host"]
   end
 
