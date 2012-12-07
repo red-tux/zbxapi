@@ -20,9 +20,23 @@ class Host < ZabbixAPI_Base
                              "select_items","select_triggers","select_graphs","select_applications",
                              "selectInterfaces","select_macros","select_profile","countOutput","groupOutput",
                              "preservekeys","sortfield","sortorder","limit","extendoutput"]
+    add_valid_params "2.0", ["nodeids","groupids","hostids","templateids", "itemids",
+                             "triggerids","graphids","proxyids","maintenanceids", "dhostids",
+                             "dserviceids","monitored_hosts","templated_hosts", "proxy_hosts",
+                             "with_items","with_monitored_items", "with_historical_items",
+                             "with_triggers","with_monitored_triggers", "with_httptests",
+                             "with_monitored_httptests","with_graphs", "editable","filter",
+                             "search","startSearch","excludeSearch", "searchWildcardsEnabled",
+                             "output","select_groups","selectParentTemplates", "select_items",
+                             "select_triggers","select_graphs","select_applications",
+                             "selectInterfaces","select_macros","select_profile","countOutput",
+                             "groupOutput", "preservekeys","sortfield","sortorder","limit",
+                             "extendoutput"]
   end
 
   action :exists do
+
+  end
     add_valid_params "1.3", ["nodeids","hostid","host"]
   end
 
