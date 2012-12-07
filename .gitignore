@@ -1,0 +1,3 @@
+# Ignore Rubymine Files
+.idea
+.idea/*
