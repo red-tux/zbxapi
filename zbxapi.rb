@@ -312,8 +312,7 @@ class ZabbixAPI
     caller[0]=~/`(.*?)'/
     caller_func=$1
 
-    raise ZbxAPI_ExceptionVersion, "#{caller_func} requires API version #{major}.#{minor} or higher" if major>@major
-    raise ZbxAPI_ExceptionVersion, "#{caller_func} requires API version #{major}.#{minor} or higher" if minor>@minor
+    raise ZbxAPI_ExceptionVersion, "#{caller_func} requires API version #{major}.#{minor} or higher" if major>@major or (minor>@minor and major>=@major)
 
   end
 
