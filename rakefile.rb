@@ -45,7 +45,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('json')
   s.require_paths =["."]
   s.files =
-    ["zbxapi.rb", "zbxapi/zdebug.rb", "zbxapi/api_exceptions.rb",
+    ["LICENSE", "zbxapi.rb", "zbxapi/zdebug.rb", "zbxapi/api_exceptions.rb",
      "zbxapi/exceptions.rb", "zbxapi/utils.rb", "zbxapi/result.rb",
      "api_classes/api_dsl.rb",
      Dir["api_classes/dsl*.rb"]].flatten
