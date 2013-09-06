@@ -1,0 +1,6 @@
+# Ignore Rubymine Files
+.idea
+.idea/*
+
+# Try to prevent uploading password information
+ts_local_vars.rb
