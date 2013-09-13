@@ -36,7 +36,7 @@ class Host < ZabbixAPI_Base
                              "editable","filter","search","startSearch","excludeSearch",
                              "searchWildcardsEnabled","output","select_groups","selectParentTemplates",
                              "select_items","select_triggers","select_graphs","select_applications",
-                             "select_macros","select_profile","countOutput","groupOutput",
+                             "selectInterfaces","select_macros","select_profile","countOutput","groupOutput",
                              "preservekeys","sortfield","sortorder","limit","extendoutput"]
     add_valid_params "2.0", ["nodeids","groupids","hostids","templateids", "itemids",
                              "triggerids","graphids","proxyids","maintenanceids", "dhostids",
@@ -53,6 +53,8 @@ class Host < ZabbixAPI_Base
   end
 
   action :exists do
+
+  end
     add_valid_params "1.3", ["nodeids","hostid","host"]
   end
 
