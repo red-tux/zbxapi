@@ -122,6 +122,12 @@ class ZabbixAPI
       @verify_ssl = true
     end
 
+    if options.has_key?:http_timeout
+      @http_timeout=options[:http_timeout]
+    else
+      @http_timeout=true
+    end
+
     #Generate the list of sub objects dynamically, from all objects
     #derived from ZabbixAPI_Base
     objects=TRUE
@@ -406,6 +412,7 @@ class ZabbixAPI
   def setup_connection
     @http=Net::HTTP.new(@url.host, @url.port)
     http.use_ssl=true if @url.class==URI::HTTPS
+    http.timeout=@http_timeout
   end
 end
 
