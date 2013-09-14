@@ -119,6 +119,12 @@ class ZabbixAPI_Method
     @requiredparams[ver]=params
   end
 
+  # Return the valid parameters for the method given version.
+  # If version is nil, the highest version number available in the valid
+  # parameters hash is used.
+  # If ver is a version number, the closest version number in the valid
+  # parameters hash which is less than or equal to is returned.
+  # nil is returned is no valid parameters are found
   def get_valid_params(ver)
     ver=get_version(ver,@validparams)
     return nil if ver.nil?
@@ -220,16 +226,52 @@ class ZabbixAPI_Method
   #If no versions exist in hash, nil is returned
   def get_version(server,hash)
     return nil if hash.nil?
-    server=server.split(".").map{|i| i.to_i }
-    hash=hash.keys.map{|i| i.split(".").map {|a| a.to_i} }
+    if server
+      #server=server.split(".").map{|i| i.to_i }
+      keys=hash.keys.sort do |a,b|
+        aa=a.split(".")
+        bb=b.split(".")
+        last_pos=((aa.length > bb.length) ? aa.length : bb.length)-1
+        pos=0
+        while aa[pos].to_i==bb[pos].to_i
+          break if pos>=last_pos
+          pos+=1
+        end
+        (aa[pos].to_i<=>bb[pos].to_i)
+      end
 
-    equality=0
-    hash.sort! {|x,y| x<=>y }
-    version=nil
-    hash.each {|i|
-      version=i if (server<=>i)>=0
-    }
-    version.join(".") if !version.nil?
+      keys.delete_if do |k|
+        kk=k.split(".")
+        ss=server.split(".")
+        last_pos=((kk.length > ss.length) ? ss.length : ss.length)-1
+        pos=0
+        while kk[pos].to_i<=ss[pos].to_i
+          break if pos>=last_pos
+          pos+=1
+        end
+        kk[pos].to_i>ss[pos].to_i
+      end
+
+      if keys.empty?
+        return nil
+      else
+        return keys.last
+      end
+    else
+      sorted=hash.keys.sort do |a,b|
+        aa=a.split(".")
+        bb=b.split(".")
+        last_pos=((aa.length > bb.length) ? aa.length : bb.length)-1
+        pos=0
+        while aa[pos].to_i==bb[pos].to_i
+          break if pos>=last_pos
+          pos+=1
+        end
+        (aa[pos].to_i<=>bb[pos].to_i)
+      end
+      p sorted
+      sorted.last
+    end
   end
 
 
@@ -251,7 +293,7 @@ class ZabbixAPI_Base
   def valid_params(sym,ver=nil)
     api_method=self.class.api_methods[sym]
     return nil if api_method.nil?
-    api_method.valid_params(ver)
+    api_method.get_valid_params(ver)
   end
 
   def self.method_missing(sym,&block)

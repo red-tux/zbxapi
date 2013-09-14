@@ -34,7 +34,7 @@ task :default => [:get_release, :test, :package, :create_release]
 
 desc "Build a version of the Gem, but do not update version file or perform git changes"
 task :test_build do
-  ENV["test_build"]=true
+  ENV["test_build"]=true.to_s       #looks like ENV can only store strings
 end
 
 Rake::TestTask.new do |t|
@@ -47,28 +47,6 @@ desc "Skip the unit tests"
 task :skip_tests do
   Rake::Task[:test].clear
 end
-
-spec = Gem::Specification.new do |s|
-  s.name = %q{zbxapi}
-  s.rubyforge_project = "zbxapi"
-  s.version = "#{ENV["release_ver"]}"
-  s.authors = ["A. Nelson"]
-  s.email = %q{nelsonab@red-tux.net}
-  s.summary = %q{Ruby wrapper to the Zabbix API}
-  s.homepage = %q{http://trac.red-tux.net/}
-  s.description = %q{Provides a straight forward interface to manipulate Zabbix servers using the Zabbix API.}
-  s.licenses = "LGPL 2.1"
-  s.requirements = "Requires json"
-  s.add_dependency('json')
-  s.require_paths =["."]
-  s.files =
-    ["LICENSE", "zbxapi.rb", "zbxapi/zdebug.rb", "zbxapi/api_exceptions.rb",
-     "zbxapi/exceptions.rb", "zbxapi/utils.rb", "zbxapi/result.rb",
-     "api_classes/api_dsl.rb",
-#     "zbxapi/revision.rb",
-     Dir["api_classes/dsl*.rb"]].flatten
-end
-
 
 desc 'Get the last revision tag, override with ENV["release_ver"]'
 task :get_release do
@@ -97,8 +75,6 @@ task :create_release do
   if ENV["test_build"]
     puts "Test mode enabled, the following command would have been executed:"
     puts cmd
-  else
-    puts "Creating git release tag"
     puts cmd
     `#{cmd}`
   end
@@ -119,6 +95,27 @@ task :update_revision do
 #    o.puts "ZBXAPI_REVISION=\"#{$rev}\""
     end
   end
+end
+
+spec = Gem::Specification.new do |s|
+  s.name = %q{zbxapi}
+  s.rubyforge_project = "zbxapi"
+  s.version = "#{ENV["release_ver"]}"
+  s.authors = ["A. Nelson"]
+  s.email = %q{nelsonab@red-tux.net}
+  s.summary = %q{Ruby wrapper to the Zabbix API}
+  s.homepage = %q{http://trac.red-tux.net/}
+  s.description = %q{Provides a straight forward interface to manipulate Zabbix servers using the Zabbix API.}
+  s.licenses = "LGPL 2.1"
+  s.requirements = "Requires json"
+  s.add_dependency('json')
+  s.require_paths =["."]
+  s.files =
+    ["LICENSE", "zbxapi.rb", "zbxapi/zdebug.rb", "zbxapi/api_exceptions.rb",
+     "zbxapi/exceptions.rb", "zbxapi/utils.rb", "zbxapi/result.rb",
+     "api_classes/api_dsl.rb",
+#     "zbxapi/revision.rb",
+     Dir["api_classes/dsl*.rb"]].flatten
 end
 
 Gem::PackageTask.new(spec) do |pkg|

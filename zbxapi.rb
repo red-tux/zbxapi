@@ -340,6 +340,23 @@ class ZabbixAPI
     end
   end
 
+  def api_info(request=:objects,*options)
+    options = options[0] || {}
+    version=options[:version] || nil
+
+    case request
+      when :objects then
+        @objects.keys.map { |k| k.to_s }
+      else
+        obj,meth=request.split(".")
+        if meth then
+          @objects[obj.intern].valid_params(meth.intern,version)
+        else
+          @objects[obj.intern].api_methods.map{ |m| m.to_s }
+        end
+    end
+  end
+
   private
 
   #Select the http object to be used.
