@@ -27,44 +27,50 @@ class Host < ZabbixAPI_Base
     #  params
     #end
 
-    add_valid_params "1.3", ["nodeids","groupids","hostids","templateids",
-                             "itemids","triggerids","graphids","proxyids","maintenanceids",
-                             "dhostids","dserviceids","monitored_hosts","templated_hosts",
-                             "proxy_hosts","with_items","with_monitored_items",
-                             "with_historical_items","with_triggers","with_monitored_triggers",
-                             "with_httptests","with_monitored_httptests","with_graphs",
-                             "editable","filter","search","startSearch","excludeSearch",
-                             "searchWildcardsEnabled","output","select_groups","selectParentTemplates",
-                             "select_items","select_triggers","select_graphs","select_applications",
-                             "selectInterfaces","select_macros","select_profile","countOutput","groupOutput",
-                             "preservekeys","sortfield","sortorder","limit","extendoutput"]
-    add_valid_params "2.0", ["nodeids","groupids","hostids","templateids", "itemids",
-                             "triggerids","graphids","proxyids","maintenanceids", "dhostids",
-                             "dserviceids","monitored_hosts","templated_hosts", "proxy_hosts",
-                             "with_items","with_monitored_items", "with_historical_items",
-                             "with_triggers","with_monitored_triggers", "with_httptests",
-                             "with_monitored_httptests","with_graphs", "editable","filter",
-                             "search","startSearch","excludeSearch", "searchWildcardsEnabled",
-                             "output","select_groups","selectParentTemplates", "select_items",
-                             "select_triggers","select_graphs","select_applications",
-                             "selectInterfaces","select_macros","select_profile","countOutput",
-                             "groupOutput", "preservekeys","sortfield","sortorder","limit",
-                             "extendoutput"]
+    parameters "1.3" do
+      add ["nodeids","groupids","hostids","templateids","itemids","triggerids",
+           "graphids","proxyids","maintenanceids","dhostids","dserviceids",
+           "monitored_hosts","templated_hosts","proxy_hosts","with_items",
+           "with_monitored_items","with_historical_items","with_triggers",
+           "with_monitored_triggers","with_httptests",
+           "with_monitored_httptests","with_graphs","editable","filter",
+           "search","startSearch","excludeSearch","searchWildcardsEnabled",
+           "output","select_groups","selectParentTemplates","select_items",
+           "select_triggers","select_graphs","select_applications",
+           "selectInterfaces","select_macros","select_profile","countOutput",
+           "groupOutput","preservekeys","sortfield","sortorder","limit",
+           "extendoutput"]
+    end
+
+    parameters "2.0" do
+      inherit from "1.3"
+    end
+
+    #parameters "3.0" do
+    #  inherit from "2.0"
+    #  remove "select_macros","preserve_keys","extendoutput"
+    #  add "test_param"
+    #  requires "test_param"
+    #end
   end
 
   action :exists do
-    add_valid_params "1.3", ["nodeids","hostid","host"]
+    parameters "1.3" do
+      add ["nodeids","hostid","host"]
+    end
   end
 
   action :create do
-    add_valid_params "1.3", ["host","name","port","status","useip",
-                             "dns","ip","proxy_hostid","useipmi","ipmi_ip","ipmi_port",
-                             "ipmi_authtype","ipmi_privilege","ipmi_username",
-                             "ipmi_password","groups","templates"]
-    add_valid_params "2.0", ["host","name","port","status","useip",
-                             "dns","ip","proxy_hostid","useipmi","ipmi_ip","ipmi_port",
-                             "ipmi_authtype","ipmi_privilege","ipmi_username",
-                             "ipmi_password","groups","templates","interfaces"]
+    parameters "1.3" do
+      add ["host","name","port","status","useip","dns","ip","proxy_hostid",
+           "useipmi","ipmi_ip","ipmi_port","ipmi_authtype","ipmi_privilege",
+           "ipmi_username","ipmi_password","groups","templates"]
+    end
+
+    parameters "2.0" do
+      inherit from "1.3"
+      add "interfaces"
+    end
   end
 
   action :delete do

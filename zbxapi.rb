@@ -343,6 +343,7 @@ class ZabbixAPI
   def api_info(request=:objects,*options)
     options = options[0] || {}
     version=options[:version] || nil
+    request_type=options[:params] || :valid
 
     case request
       when :objects then
@@ -350,7 +351,12 @@ class ZabbixAPI
       else
         obj,meth=request.split(".")
         if meth then
-          @objects[obj.intern].valid_params(meth.intern,version)
+          case request_type
+            when :valid
+              @objects[obj.intern].valid_params(meth.intern,version)
+            when :required
+              @objects[obj.intern].required_params(meth.intern,version)
+          end
         else
           @objects[obj.intern].api_methods.map{ |m| m.to_s }
         end

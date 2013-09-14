@@ -26,6 +26,41 @@
 
 require "zbxapi/zdebug"
 require "zbxapi/exceptions"
+require "pp"
+
+class ZabbixAPI_ParametersDSL
+  attr_reader :valid_params, :required_params
+
+  def initialize(other_validparams,other_requiredparams)
+    @other_valid_parameters=other_validparams
+    @other_required_parameters=other_requiredparams
+    @valid_params=[]
+    @required_params=[]
+  end
+
+  def inherit(ver)
+    @valid_params=@other_valid_parameters[ver] || []
+    @required_params=@other_required_parameters[ver] || []
+  end
+
+  def add(*params)
+    @valid_params+=params
+    @valid_params.flatten!
+  end
+
+  def remove(*params)
+    @valid_params-=params
+  end
+
+  def from(var)
+    var
+  end
+
+  def requires(*params)
+    @required_params+=params
+    @required_params.flatten!
+  end
+end
 
 class ZabbixAPI_Method
   include ZDebug
@@ -65,6 +100,12 @@ class ZabbixAPI_Method
     #Deprecate can only be called once
     raise AlreadyUsedError.new("Deprecate can only be used once per method") if @deprecated
     @deprecated={ver=>(msg || "") }
+  end
+
+  def deprecate_dsl(msg)
+    warn msg
+    caller[1]=~/(.*:\d+):.*`(.*?)'/
+    warn "from: #{$1}"
   end
 
   #Invalidate this function starting at API version ver
@@ -112,10 +153,12 @@ class ZabbixAPI_Method
   end
 
   def add_valid_params(ver,params)
+    deprecate_dsl("DSL statement add_valid_params is deprecated, use the parameters statement")
     @validparams[ver]=params
   end
 
   def add_required_params(ver,params)
+    deprecate_dsl("DSL statement add_required_params is deprecated, use the parameters statement")
     @requiredparams[ver]=params
   end
 
@@ -135,6 +178,14 @@ class ZabbixAPI_Method
     ver=get_version(ver,@requiredparams)
     return nil if ver.nil?
     @requiredparams[ver]
+  end
+
+  def parameters(ver,&block)
+    parameters=ZabbixAPI_ParametersDSL.new(@validparams,@requiredparams)
+
+    parameters.instance_eval(&block) if !block.nil?
+    @validparams[ver]=parameters.valid_params
+    @requiredparams[ver]=parameters.required_params
   end
 
   def params_good?(server_version, params)
@@ -294,6 +345,12 @@ class ZabbixAPI_Base
     api_method=self.class.api_methods[sym]
     return nil if api_method.nil?
     api_method.get_valid_params(ver)
+  end
+
+  def required_params(sym,ver=nil)
+    api_method=self.class.api_methods[sym]
+    return nil if api_method.nil?
+    api_method.get_required_params(ver)
   end
 
   def self.method_missing(sym,&block)
