@@ -35,14 +35,15 @@ Trigger.delete
 Trigger.deleteDependencies
 Trigger.exists
 Trigger.get do
-  add_valid_params "1.3", ['triggerids', "select_functions", "nodeids", "groupids", "templateids",
+  parameters "1.3",
+      'triggerids', "select_functions", "nodeids", "groupids", "templateids",
       "hostids", "itemids", "applicationids", "functions", "inherited", "templated", "monitored",
       "active", "maintenance", "withUnacknowledgedEvents", "withAcknowledgedEvents",
       "withLastEventUnacknowledged", "skipDependent", "editable", "lastChangeSince",
       "lastChangeTill", "filter", "group", "host", "only_true", "min_severity", "search",
       "startSearch", "excludeSearch", "searchWildcardsEnabled", "output", "expandData",
       "expandDescription", "select_groups", "select_hosts", "select_items", "select_dependencies",
-      "countOutput", "groupOutput", "preservekeys", "sortfield", "sortorder", "limit"]
+      "countOutput", "groupOutput", "preservekeys", "sortfield", "sortorder", "limit"
 end
 Trigger.update
 

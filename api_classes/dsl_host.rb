@@ -27,8 +27,8 @@ class Host < ZabbixAPI_Base
     #  params
     #end
 
-    parameters "1.3" do
-      add ["nodeids","groupids","hostids","templateids","itemids","triggerids",
+    parameters "1.3",
+           "nodeids","groupids","hostids","templateids","itemids","triggerids",
            "graphids","proxyids","maintenanceids","dhostids","dserviceids",
            "monitored_hosts","templated_hosts","proxy_hosts","with_items",
            "with_monitored_items","with_historical_items","with_triggers",
@@ -39,8 +39,7 @@ class Host < ZabbixAPI_Base
            "select_triggers","select_graphs","select_applications",
            "selectInterfaces","select_macros","select_profile","countOutput",
            "groupOutput","preservekeys","sortfield","sortorder","limit",
-           "extendoutput"]
-    end
+           "extendoutput"
 
     parameters "2.0" do
       inherit from "1.3"
@@ -56,15 +55,16 @@ class Host < ZabbixAPI_Base
 
   action :exists do
     parameters "1.3" do
-      add ["nodeids","hostid","host"]
+      add "nodeids","hostid","host"
     end
   end
 
   action :create do
     parameters "1.3" do
-      add ["host","name","port","status","useip","dns","ip","proxy_hostid",
+      add "host","name","port","status","useip","dns","ip","proxy_hostid",
            "useipmi","ipmi_ip","ipmi_port","ipmi_authtype","ipmi_privilege",
-           "ipmi_username","ipmi_password","groups","templates"]
+           "ipmi_username","ipmi_password","groups","templates"
+      requires "groups","interfaces"
     end
 
     parameters "2.0" do

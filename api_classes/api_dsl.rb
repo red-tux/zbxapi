@@ -49,6 +49,7 @@ class ZabbixAPI_ParametersDSL
   end
 
   def remove(*params)
+    #TODO Add sanity checking to ensure that a removed parameter is also removed from the required list
     @valid_params-=params
   end
 
@@ -57,6 +58,7 @@ class ZabbixAPI_ParametersDSL
   end
 
   def requires(*params)
+    #TODO Add sanity checking to ensure that required arguments are also valid arguments
     @required_params+=params
     @required_params.flatten!
   end
@@ -180,9 +182,10 @@ class ZabbixAPI_Method
     @requiredparams[ver]
   end
 
-  def parameters(ver,&block)
+  def parameters(ver,*params,&block)
     parameters=ZabbixAPI_ParametersDSL.new(@validparams,@requiredparams)
 
+    parameters.add(params) if !params.nil?
     parameters.instance_eval(&block) if !block.nil?
     @validparams[ver]=parameters.valid_params
     @requiredparams[ver]=parameters.required_params
@@ -320,7 +323,6 @@ class ZabbixAPI_Method
         end
         (aa[pos].to_i<=>bb[pos].to_i)
       end
-      p sorted
       sorted.last
     end
   end
