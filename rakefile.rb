@@ -26,11 +26,24 @@ require 'rake'
 require 'rdoc/task'
 require 'rubygems/package_task'
 require 'rake/testtask'
+require 'pp'
 
 #setup our search path or libraries
 $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '.'))
 
-task :default => [:get_release, :test, :package, :create_release]
+def get_release_num
+  if ENV["release_ver"].nil?
+    revs=`git tag -l 'rev*' | sort -t. -k1,1n -k2,2n -k3,3n | grep -E '^rev([0-9]+\.){2}[0-9]+$'`
+    revs=revs.gsub("\r","").gsub("rev","").split("\n")
+    if revs.empty?
+      fail '****  No release tags found, and ENV["release_ver"] is empty  ****'
+    end
+
+    ENV["release_ver"]=revs[-1]
+  end
+  ENV["release_ver"]
+end
+task :default => [:test, :package]
 
 desc "Build a version of the Gem, but do not update version file or perform git changes"
 task :test_build do
@@ -48,36 +61,35 @@ task :skip_tests do
   Rake::Task[:test].clear
 end
 
-desc 'Get the last revision tag, override with ENV["release_ver"]'
-task :get_release do
-  if ENV["release_ver"].nil?
-    revs=`git tag -l 'rev*' | sort -t. -k1,1n -k2,2n -k3,3n | grep -E '^rev([0-9]+\.){2}[0-9]+$'`
-    p revs
-    revs=revs.gsub("\r","").gsub("rev","").split("\n")
-    if revs.empty?
-      fail '****  No release tags found, and ENV["release_ver"] is empty  ****'
-    end
-    puts "Last Release version found: #{revs[-1]}"
-    rev=revs[-1]
-    rev_parts=rev.split(".").map{ |i| Integer(i)}
-    rev_parts[-1]+=1
-
-    ENV["release_ver"]=rev_parts.join(".")
-  else
-    puts 'Release version was passed in via ENV["release_ver"]'
-  end
-  puts "Using \"#{ENV["release_ver"]}\" for gem version"
+desc "Bump the revision number"
+task :bump_rev do
+  rev_parts=get_release_num.split(".").map{ |i| Integer(i)}
+  rev_parts[2]+=1  #0.1.2
+  ENV["release_ver"]=rev_parts.join(".")
 end
 
-desc "Create release number and git tag"
-task :create_release do
-  cmd = "git tag -a rev#{ENV["release_ver"]} -m \"Release version: #{ENV["release_ver"]}\""
-  if ENV["test_build"]
-    puts "Test mode enabled, the following command would have been executed:"
-    puts cmd
-    puts cmd
-    `#{cmd}`
-  end
+desc "Bump the minor version number"
+task :bump_minor do
+  rev_parts=get_release_num.split(".").map{ |i| Integer(i)}
+  rev_parts[1]+=1  #0.1.2
+  rev_parts[2]=0
+  ENV["release_ver"]=rev_parts.join(".")
+end
+
+desc "Bump the major version number"
+task :bump_major do
+  rev_parts=get_release_num.split(".").map{ |i| Integer(i)}
+  rev_parts[0]+=1  #0.1.2
+  rev_parts[1]=0
+  rev_parts[2]=0
+  ENV["release_ver"]=rev_parts.join(".")
+end
+
+desc "Create Version Tag"
+task :tag_version do
+  ver=get_release_num
+  puts "Creating tag for version: #{ver}"
+  `git tag -a rev#{ver} -m \"Release version: #{ver}\"`
 end
 
 desc "Update the revision to the release number"
@@ -98,13 +110,13 @@ task :update_revision do
 end
 
 spec = Gem::Specification.new do |s|
-  s.name = %q{zbxapi}
+  s.name = "zbxapi"
   s.rubyforge_project = "zbxapi"
-  s.version = "#{ENV["release_ver"]}"
+  s.version = get_release_num
   s.authors = ["A. Nelson"]
   s.email = %q{nelsonab@red-tux.net}
   s.summary = %q{Ruby wrapper to the Zabbix API}
-  s.homepage = %q{http://trac.red-tux.net/}
+  s.homepage = %q{https://github.com/red-tux/zbxapi}
   s.description = %q{Provides a straight forward interface to manipulate Zabbix servers using the Zabbix API.}
   s.licenses = "LGPL 2.1"
   s.requirements = "Requires json"
@@ -120,5 +132,6 @@ end
 
 Gem::PackageTask.new(spec) do |pkg|
   pkg.package_dir = "gems"
+#  pkg.version="#{ENV["release_ver"]}"
 #  pkg.version = "0.1.#{$rev}"
 end
