@@ -13,7 +13,7 @@ require 'pp'
 zabbix = ZabbixAPI.new("http://zabbix.example.com/", :verify_ssl => false, :http_timeout => 300 )
 zabbix.login("api-user","api-pass")
 
-pp zabbix.hitory.get({'itemids'=>[1234,5678]})
+pp zabbix.history.get({'itemids'=>[1234,5678]})
 ```
 
 To get a list of valid objects, methods and parameters, use the api_info method.
