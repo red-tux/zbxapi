@@ -26,12 +26,13 @@
 
 revision="$Revision$"
 result=/[^\d]*(\d*)[^\d]*/.match(revision)
-revision=result[1].to_i
+#revision=result[1].to_i
+revision=3
 
 spec = Gem::Specification.new do |s|
   s.name = %q{zbxapi}
   s.rubyforge_project = "zbxapi"
-  s.version = "0.1.#{revision}"
+  s.version = "0.3.#{revision}"
   s.authors = ["A. Nelson"]
   s.email = %q{nelsonab@red-tux.net}
   s.summary = %q{Ruby wrapper to the Zabbix API}
