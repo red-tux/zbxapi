@@ -70,7 +70,7 @@ class Host < ZabbixAPI_Base
 
     parameters "2.0" do
       inherit from "1.3"
-      add "interfaces"
+      add "interfaces","macros"
     end
   end
 
