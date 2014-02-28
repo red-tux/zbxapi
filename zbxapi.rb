@@ -125,7 +125,8 @@ class ZabbixAPI
     if options.has_key?:http_timeout
       @http_timeout=options[:http_timeout]
     else
-      @http_timeout=true
+      #if not set, default http read_timeout=60
+      @http_timeout=nil
     end
 
     #Generate the list of sub objects dynamically, from all objects
@@ -377,6 +378,8 @@ class ZabbixAPI
     if !@verify_ssl
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE if @url.class==URI::HTTPS
     end
+    http.read_timeout=@http_timeout unless @http_timeout.nil?
+
     http
   end
 
@@ -430,12 +433,6 @@ class ZabbixAPI
     rescue NoMethodError
       raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host}: \"#{e}\"", :retry=>false)
     end
-  end
-
-  def setup_connection
-    @http=Net::HTTP.new(@url.host, @url.port)
-    http.use_ssl=true if @url.class==URI::HTTPS
-    http.timeout=@http_timeout
   end
 end
 
