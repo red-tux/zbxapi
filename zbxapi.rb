@@ -75,6 +75,7 @@ class ZabbixAPI
   @url=nil
   @verify_ssl=true
   @proxy_server=nil
+  @custom_headers=[]
 
   private
     @user_name=''
@@ -127,6 +128,10 @@ class ZabbixAPI
     else
       #if not set, default http read_timeout=60
       @http_timeout=nil
+    end
+
+    if options.has_key?:custom_headers
+      @custom_headers = options[:custom_headers];
     end
 
     #Generate the list of sub objects dynamically, from all objects
@@ -392,8 +397,12 @@ class ZabbixAPI
       http=select_http_obj
       response = nil
 #    http.set_debug_output($stderr)                                  #Uncomment to see low level HTTP debug
-      headers={'Content-Type'=>'application/json-rpc',
-        'User-Agent'=>'Zbx Ruby CLI'}
+
+      headers={
+        'Content-Type'=>'application/json-rpc',
+        'User-Agent'=>'Zbx Ruby CLI'
+      }.merge(@custom_headers)
+
       debug(4,:msg=>"Sending: #{json_obj}")
       response = http.post(@url.path, json_obj,headers)
       debug(4,:msg=>"Response Code: #{response.code}")
