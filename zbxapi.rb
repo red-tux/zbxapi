@@ -75,7 +75,7 @@ class ZabbixAPI
   @url=nil
   @verify_ssl=true
   @proxy_server=nil
-  @custom_headers=[]
+  @custom_headers={}
 
   private
     @user_name=''
