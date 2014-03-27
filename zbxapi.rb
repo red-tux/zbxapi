@@ -131,7 +131,7 @@ class ZabbixAPI
     end
 
     if options.has_key?:custom_headers
-      @custom_headers = options[:custom_headers];
+      @custom_headers = options[:custom_headers] unless options[:custom_headers].nil?
     end
 
     #Generate the list of sub objects dynamically, from all objects
