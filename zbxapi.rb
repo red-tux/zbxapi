@@ -70,20 +70,8 @@ class ZabbixAPI
 
   attr_accessor :method, :params, :debug_level, :auth, :verify_ssl, :proxy_server
 
-  @id=0
-  @auth=''
-  @url=nil
-  @verify_ssl=true
-  @proxy_server=nil
-  @custom_headers={}
-
-  private
-    @user_name=''
-    @password=''
-
-
-    class Redirect < Exception #:nodoc: all
-    end
+  class Redirect < Exception #:nodoc: all
+  end
 
   public
 
@@ -111,6 +99,16 @@ class ZabbixAPI
       warn "WARNING: This depreciated functionality will be removed in a future release"
       options={:debug=>0,:returntype=>:result}
     end
+
+    #intialization of instance variables must happen inside of instantiation
+    @id=0
+    @auth=''
+    @url=nil
+    @verify_ssl=true
+    @proxy_server=nil
+    @custom_headers={}
+    @user_name=''
+    @password=''
 
     set_debug_level(options[:debug] || 0)
     @returntype=options[:returntype] || :result
@@ -165,7 +163,6 @@ class ZabbixAPI
     debug(6,:msg=>"query: #{@url.query}, fragment: #{@url.fragment}")
 
     if block_given?
-      puts "block"
       yield(self)
     end
   end
@@ -397,7 +394,6 @@ class ZabbixAPI
       http=select_http_obj
       response = nil
 #    http.set_debug_output($stderr)                                  #Uncomment to see low level HTTP debug
-
       headers={
         'Content-Type'=>'application/json-rpc',
         'User-Agent'=>'Zbx Ruby CLI'
@@ -433,12 +429,12 @@ class ZabbixAPI
         end
       end
 
-		  return resp
+      return resp
 
-		rescue Redirect
-		  redirects+=1
-			retry if redirects<=5
-			raise ZbxAPI_GeneralError, "Too many redirects"
+    rescue Redirect
+      redirects+=1
+      retry if redirects<=5
+      raise ZbxAPI_GeneralError, "Too many redirects"
     rescue NoMethodError
       raise ZbxAPI_GeneralError.new("Unable to connect to #{@url.host}: \"#{e}\"", :retry=>false)
     end
