@@ -251,7 +251,7 @@ class ZabbixAPI
         raise ZbxAPI_ExceptionBadAuth.new('Invalid User or Password',:error_code=>e.error_code)
       end
     rescue SocketError
-      raise ZbxAPI_ExceptionBadServerUrl
+      raise ZbxAPI_ExceptionBadServerUrl.new("Socket Error")
     rescue JSON::ParserError
       raise ZbxAPI_ExceptionBadServerUrl
     rescue Errno::ECONNREFUSED
