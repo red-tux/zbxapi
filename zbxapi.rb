@@ -194,7 +194,12 @@ class ZabbixAPI
         'auth'=>@auth,
         'id'=>@id
       }
+
+    # Zabbix Doc(2.4): This method is available to unauthenticated
+    #  users and must be called without the auth parameter
+    #  in the JSON-RPC request.
     obj.delete("auth") if method =~ /APIInfo/i
+
     debug(10, :msg=>"json_obj:  #{obj}")
     return obj.to_json
   end
