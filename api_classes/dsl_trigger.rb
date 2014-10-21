@@ -27,15 +27,17 @@
 require "api_classes/api_dsl"
 
 class Trigger < ZabbixAPI_Base
-end
+  action :create do
+    parameters "2.4" do
+      add "triggerid","description","expression","comments","error","flags",
+      "lastchange","priority","state","status","templateid","type","url",
+      "value","dependencies"
+      requires "description","expression"
+    end
+  end
 
-Trigger.addDependencies
-Trigger.create
-Trigger.delete
-Trigger.deleteDependencies
-Trigger.exists
-Trigger.get do
-  parameters "1.3",
+  action :get do
+    parameters "1.3",
       'triggerids', "select_functions", "nodeids", "groupids", "templateids",
       "hostids", "itemids", "applicationids", "functions", "inherited", "templated", "monitored",
       "active", "maintenance", "withUnacknowledgedEvents", "withAcknowledgedEvents",
@@ -44,6 +46,41 @@ Trigger.get do
       "startSearch", "excludeSearch", "searchWildcardsEnabled", "output", "expandData",
       "expandDescription", "select_groups", "select_hosts", "select_items", "select_dependencies",
       "countOutput", "groupOutput", "preservekeys", "sortfield", "sortorder", "limit"
+
+    parameters "2.4" do
+      add "triggerids","groupids","templateids","hostids","itemids",
+      "applicationids","functions","group","host","inherited","templated",
+      "monitored","active","maintenance","withUnacknowledgedEvents",
+      "withAcknowledgedEvents","withLastEventUnacknowledged","skipDependent",
+      "lastChangeSince","lastChangeTill","only_true","min_severity",
+      "expandComment","expandDescription","expandExpression","selectGroups",
+      "selectHosts","selectItems","selectFunctions","selectDependencies",
+      "selectDiscoveryRule","selectLastEvent","filter","limitSelects",
+      "sortfield","countOutput","editable","excludeSearch","limit","output",
+      "preservekeys","search","searchByAny","searchWildcardsEnabled",
+      "sortorder","startSearch"
+      #deprecate "expandData"
+    end
+  end
+
+  action :adddependencies do
+    parameters "2.4" do
+      add       "triggerid","dependsOnTriggerid"
+      requires "triggerid","dependsOnTriggerid"
+    end
+  end
+
+  action :update do
+    parameters "2.4" do
+      add       "triggerid","description","expression","comments","error","flags",
+      "lastchange","priority","state","status","templateid","type","url",
+      "value","dependencies"
+      requires "description","expression"
+    end
+  end
 end
-Trigger.update
+
+Trigger.delete
+Trigger.deleteDependencies
+Trigger.exists
 

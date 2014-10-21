@@ -194,6 +194,7 @@ class ZabbixAPI
         'auth'=>@auth,
         'id'=>@id
       }
+    obj.delete("auth") if method =~ /APIInfo/i
     debug(10, :msg=>"json_obj:  #{obj}")
     return obj.to_json
   end

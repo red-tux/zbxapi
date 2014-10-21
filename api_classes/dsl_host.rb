@@ -19,7 +19,6 @@
 require "api_classes/api_dsl"
 
 class Host < ZabbixAPI_Base
-  actions :update, :massAdd, :massUpdate, :massRemove
 
   action :get do
     #arg_processor "1.3" do |params|
@@ -44,6 +43,22 @@ class Host < ZabbixAPI_Base
     parameters "2.0" do
       inherit from "1.3"
       add "selectGroups"
+    end
+
+    parameters "2.4" do
+      add "groupids","applicationids","dserviceids","graphids","hostids",
+          "httptestids","interfaceids","itemids","maintenanceids","monitored_hosts",
+          "proxy_hosts","proxyids","templated_hosts","templateids","triggerids",
+          "with_items","with_applications","with_graphs","with_httptests",
+          "with_monitored_httptests","with_monitored_items",
+          "with_monitored_triggers","with_simple_graph_items","with_triggers",
+          "withInventory","selectGroups","selectApplications","selectDiscoveries",
+          "selectDiscoveryRule","selectGraphs","selectHostDiscovery",
+          "selectHttpTests","selectInterfaces","selectInventory","selectItems",
+          "selectMacros","selectParentTemplates","selectScreens","selectTriggers",
+          "filter","limitSelects","search","searchInventory","sortfield",
+          "countOutput","editable","excludeSearch","limit","output","preservekeys",
+          "searchByAny","searchWildcardsEnabled","sortorder","startSearch"
     end
 
     #parameters "3.0" do
@@ -73,6 +88,17 @@ class Host < ZabbixAPI_Base
       add "interfaces","macros"
       requires "interfaces"
     end
+
+    parameters "2.4" do
+      add "hostid","host","available","description","disable_until","error",
+      "errors_from","flags","ipmi_authtype","ipmi_available",
+      "ipmi_disable_until","ipmi_error","ipmi_errors_from","ipmi_password",
+      "ipmi_privilege","ipmi_username","jmx_available","jmx_disable_until",
+      "jmx_error","jmx_errors_from","maintenance_from","maintenance_status",
+      "maintenance_type","maintenanceid","name","proxy_hostid","snmp_available",
+      "snmp_disable_until","snmp_error","snmp_errors_from","status"
+      requires "host","groups","interfaces"
+    end
   end
 
   action :delete do
@@ -88,4 +114,44 @@ class Host < ZabbixAPI_Base
     end
   end
 
+  action :massadd do
+    parameters "2.4" do
+      add "hosts","groups","interfaces","macros","templates"
+      requires "hosts"
+    end
+  end
+
+  action :massremove do
+    parameters "2.4" do
+      add "hostids","groupids","interfaces","macros","templateids",
+      "templateids_clear"
+      requires "hostids"
+    end
+  end
+
+  action :update do
+    parameters "2.4" do
+      add "hostid","host","available","description","disable_until","error",
+      "errors_from","flags","ipmi_authtype","ipmi_available",
+      "ipmi_disable_until","ipmi_error","ipmi_errors_from","ipmi_password",
+      "ipmi_privilege","ipmi_username","jmx_available","jmx_disable_until",
+      "jmx_error","jmx_errors_from","maintenance_from","maintenance_status",
+      "maintenance_type","maintenanceid","name","proxy_hostid","snmp_available",
+      "snmp_disable_until","snmp_error","snmp_errors_from","status"
+      requires "host"
+    end
+  end
+
+  action :massupdate do
+    parameters "2.4" do
+      add "hostid","host","available","description","disable_until","error",
+      "errors_from","flags","ipmi_authtype","ipmi_available",
+      "ipmi_disable_until","ipmi_error","ipmi_errors_from","ipmi_password",
+      "ipmi_privilege","ipmi_username","jmx_available","jmx_disable_until",
+      "jmx_error","jmx_errors_from","maintenance_from","maintenance_status",
+      "maintenance_type","maintenanceid","name","proxy_hostid","snmp_available",
+      "snmp_disable_until","snmp_error","snmp_errors_from","status"
+      requires "host","hosts"
+    end
+  end
 end
