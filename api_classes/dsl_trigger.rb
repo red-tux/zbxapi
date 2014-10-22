@@ -78,6 +78,8 @@ class Trigger < ZabbixAPI_Base
       requires "description","expression"
     end
   end
+
+  alias :addDependencies :adddependencies
 end
 
 Trigger.delete

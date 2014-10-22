@@ -154,4 +154,8 @@ class Host < ZabbixAPI_Base
       requires "host","hosts"
     end
   end
+
+  alias :massAdd :massadd
+  alias :massRemove :massremove
+  alias :massUpdate :massupdate
 end
