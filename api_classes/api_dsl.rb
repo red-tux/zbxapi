@@ -29,6 +29,9 @@ require "zbxapi/exceptions"
 require "pp"
 
 class ZabbixAPI_ParametersDSL
+  class InvalidRequiredParameter<RuntimeError
+  end
+
   attr_reader :valid_params, :required_params
 
   def initialize(other_validparams,other_requiredparams)
@@ -38,27 +41,70 @@ class ZabbixAPI_ParametersDSL
     @required_params=[]
   end
 
+  #Inherit the valid and required parameters from the version string ver
   def inherit(ver)
     @valid_params=@other_valid_parameters[ver] || []
     @required_params=@other_required_parameters[ver] || []
   end
 
   def add(*params)
+    location=caller.select {|i| i=~/api_classes\/dsl/}.first.split(":")[0..1].join(":")
+    #Iterate through the parameters and check to see if it's in the valid parameters list
+    #and check to see if it's been given before.
+    params.delete_if do |param|
+      if @valid_params.include? param
+        warn("Parameter '#{param}' is already a valid parameter, skipping: #{location}")
+        true
+      else
+        false
+      end
+    end
     @valid_params+=params
     @valid_params.flatten!
   end
 
   def remove(*params)
-    #TODO Add sanity checking to ensure that a removed parameter is also removed from the required list
     @valid_params-=params
+    @required_params-=params
   end
 
+  #Function to provide some syntactic sugar for the DSL
   def from(var)
     var
   end
 
+  #Set the list of required parameters to the parameter list
+  def set_requires(*params)
+    location=caller.select {|i| i=~/api_classes\/dsl/}.first.split(":")[0..1].join(":")
+    #Iterate through the parameters and check to see if it's in the valid parameters list
+    #and check to see if it's been given before.
+    params.each do |param|
+      if !@valid_params.include? param
+        raise InvalidRequiredParameter.new("Parameter '#{param}' is not in the valid list of parameters: #{location}")
+      end
+    end
+
+    @required_params=params
+    @required_params.flatten!
+  end
+
+  #Append the parameters given to the required parameters list.
   def requires(*params)
-    #TODO Add sanity checking to ensure that required arguments are also valid arguments
+    location=caller.select {|i| i=~/api_classes\/dsl/}.first.split(":")[0..1].join(":")
+    #Iterate through the parameters and check to see if it's in the valid parameters list
+    #and check to see if it's been given before.
+    params.delete_if do |param|
+      if !@valid_params.include? param
+        raise InvalidRequiredParameter.new("Parameter '#{param}' is not in the valid list of parameters: #{location}")
+      end
+      if @required_params.include? param
+        warn("Parameter '#{param}' is already a required parameter, skipping: #{location}")
+        true
+      else
+        false
+      end
+    end
+
     @required_params+=params
     @required_params.flatten!
   end
@@ -376,14 +422,17 @@ class ZabbixAPI_Base
     @api_aliases
   end
 
-  def self.alias(from,to)
+  # Define an alias for an existing method.
+  # From: the new method name
+  # To: the existing method which the alias "from" will point to
+  def self.api_alias(from,to)
     @api_aliases={} if @api_aliases.nil?
     @api_aliases[from]=to
 
-    @api_methods[to]=@api_methods[from]
+    @api_methods[from]=@api_methods[to]
 
-    define_method(to) do |params|
-      self.class.api_methods[to].do(@server,params)
+    define_method(from) do |params|
+      self.class.api_methods[from].do(@server,params)
     end
   end
 

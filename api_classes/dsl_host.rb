@@ -90,15 +90,17 @@ class Host < ZabbixAPI_Base
     end
 
     parameters "2.4" do
-      add "hostid","host","available","description","disable_until","error",
-      "errors_from","flags","ipmi_authtype","ipmi_available",
-      "ipmi_disable_until","ipmi_error","ipmi_errors_from","ipmi_password",
-      "ipmi_privilege","ipmi_username","jmx_available","jmx_disable_until",
-      "jmx_error","jmx_errors_from","maintenance_from","maintenance_status",
-      "maintenance_type","maintenanceid","name","proxy_hostid","snmp_available",
-      "snmp_disable_until","snmp_error","snmp_errors_from","status"
-      requires "host","groups","interfaces"
+      inherit from "2.0"
+      add "hostid","available","description","disable_until","error","errors_from",
+          "flags","inventory","ipmi_available","ipmi_disable_until","ipmi_error",
+          "ipmi_errors_from","jmx_available","jmx_disable_until","jmx_error",
+          "jmx_errors_from","maintenance_from","maintenance_status",
+          "maintenance_type","maintenanceid","snmp_available","snmp_disable_until",
+          "snmp_error","snmp_errors_from"
+      remove "dns","ip","ipmi_ip","port","useip","useipmi"
+      requires "host"
     end
+
   end
 
   action :delete do
@@ -131,7 +133,7 @@ class Host < ZabbixAPI_Base
 
   action :update do
     parameters "2.4" do
-      add "hostid","host","available","description","disable_until","error",
+      add "host","hostid","host","available","description","disable_until","error",
       "errors_from","flags","ipmi_authtype","ipmi_available",
       "ipmi_disable_until","ipmi_error","ipmi_errors_from","ipmi_password",
       "ipmi_privilege","ipmi_username","jmx_available","jmx_disable_until",
@@ -144,7 +146,7 @@ class Host < ZabbixAPI_Base
 
   action :massupdate do
     parameters "2.4" do
-      add "hostid","host","available","description","disable_until","error",
+      add "hostid","host","hosts","available","description","disable_until","error",
       "errors_from","flags","ipmi_authtype","ipmi_available",
       "ipmi_disable_until","ipmi_error","ipmi_errors_from","ipmi_password",
       "ipmi_privilege","ipmi_username","jmx_available","jmx_disable_until",
@@ -155,7 +157,7 @@ class Host < ZabbixAPI_Base
     end
   end
 
-  alias :massAdd :massadd
-  alias :massRemove :massremove
-  alias :massUpdate :massupdate
+  api_alias :massAdd, :massadd
+  api_alias :massRemove, :massremove
+  api_alias :massUpdate, :massupdate
 end
