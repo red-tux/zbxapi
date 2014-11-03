@@ -195,10 +195,15 @@ class ZabbixAPI
         'id'=>@id
       }
 
+    # https://www.zabbix.com/documentation/2.4/manual/api/reference/apiinfo/version
+    # https://www.zabbix.com/documentation/2.4/manual/api/reference/user/login
     # Zabbix Doc(2.4): This method is available to unauthenticated
     #  users and must be called without the auth parameter
     #  in the JSON-RPC request.
-    obj.delete("auth") if method =~ /APIInfo/i
+    debug(4, :var => method,:msg => "Method:")
+    obj.delete("auth") if ["apiinfo.version",
+                           "user.login",
+                          ].any? { |str| method =~ /#{str}/i }
 
     debug(10, :msg=>"json_obj:  #{obj}")
     return obj.to_json
