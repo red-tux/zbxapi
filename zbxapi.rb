@@ -251,7 +251,7 @@ class ZabbixAPI
       @auth=result['result']
 
       #setup the version variables
-      @major,@minor=do_request(json_obj('APIInfo.version',{}))['result'].split('.')
+      @major,@minor=do_request(json_obj('apiinfo.version',{}))['result'].split('.')
       @major=@major.to_i
       @minor=@minor.to_i
     rescue ZbxAPI_ExceptionLoginPermission => e
