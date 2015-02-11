@@ -139,7 +139,7 @@ class Host < ZabbixAPI_Base
       "ipmi_privilege","ipmi_username","jmx_available","jmx_disable_until",
       "jmx_error","jmx_errors_from","maintenance_from","maintenance_status",
       "maintenance_type","maintenanceid","name","proxy_hostid","snmp_available",
-      "snmp_disable_until","snmp_error","snmp_errors_from","status"
+      "snmp_disable_until","snmp_error","snmp_errors_from","status", "templates", "groups"
       requires "host"
     end
   end
