@@ -31,3 +31,4 @@ end
 
 Proxy.get
 Proxy.create
+Proxy.delete
