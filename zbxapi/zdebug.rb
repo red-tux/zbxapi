@@ -61,10 +61,10 @@ module ZDebug
     facility=args[:facility] || nil
     raise "Facility must be a symbol" if facility && facility.class!=Symbol
     truncate=args[:truncate] || 0
-    raise "Truncate must be an Integer" if truncate.class!=Fixnum
+    raise "Truncate must be an Integer" if truncate.class!=Integer
     overload=(!args[:overload].nil? && args[:overload]==true) || false
     stack_pos=args[:stack_pos] || 0
-    raise ":stack_pos must be an Integer" if stack_pos.class!=Fixnum
+    raise ":stack_pos must be an Integer" if stack_pos.class!=Integer
     backtrace_depth=args[:trace_depth] || 0
 
     return if overload
