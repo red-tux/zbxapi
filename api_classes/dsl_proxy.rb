@@ -30,3 +30,6 @@ class Proxy < ZabbixAPI_Base
 end
 
 Proxy.get
+Proxy.create
+Proxy.delete
+Proxy.update
