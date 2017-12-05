@@ -136,7 +136,7 @@ class ZabbixAPI
 
     #Generate the list of sub objects dynamically, from all objects
     #derived from ZabbixAPI_Base
-    objects=TRUE
+    objects=true
     silence_warnings do
       objects=Object.constants.map do |i|
         obj=Object.const_get(i.intern)
