@@ -92,7 +92,7 @@ class ZabbixAPI
   def initialize(url,*args)
     options=args[0]
     options ||= {}
-    if options.is_a?(Fixnum)
+    if options.is_a?(Integer)
       warn "WARNING: Initialization has changed, backwards compatability is being used."
       warn "WARNING: Use ZabbixAPI.new(url,:debug=>n,:returntype=>:result) to have the"
       warn "WARNING: same capability as previous versions."
@@ -136,7 +136,7 @@ class ZabbixAPI
 
     #Generate the list of sub objects dynamically, from all objects
     #derived from ZabbixAPI_Base
-    objects=TRUE
+    objects=true
     silence_warnings do
       objects=Object.constants.map do |i|
         obj=Object.const_get(i.intern)
@@ -420,7 +420,7 @@ class ZabbixAPI
         when 301
           puts "Redirecting to #{response['location']}"
           @url=URI.parse(response['location'])
-				  raise Redirect
+          raise Redirect
         when 500
           raise ZbxAPI_GeneralError.new("Zabbix server returned an internal error\n Call: #{json_obj}", :retry=>true)
       end

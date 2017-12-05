@@ -106,7 +106,7 @@ class Host < ZabbixAPI_Base
   action :delete do
     add_arg_processor "0" do |params|
       retval=nil
-      if params.is_a?(Fixnum)
+      if params.is_a?(Integer)
         retval=[{"hostid"=>params}]
       else
         retval=params
